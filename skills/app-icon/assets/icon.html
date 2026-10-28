@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App icon workbench</title>
+    <!-- Webfonts for a typeface study go here (study only — masters never
+         depend on them; outline the winner with outline-text.py):
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=…&display=block" rel="stylesheet" />
+    -->
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="icon.css" />
+  </head>
+  <body>
+    <script src="icon.js"></script>
+    <script>
+      /* ===================================================================
+         Icon concepts for THIS product. One object per direction; the engine
+         (icon.js) renders each into every platform context and emits the
+         export masters. Geometry: draw on a 1024 grid; keep anything
+         essential inside the circle r 469 around (512, 512) — the Android
+         safe zone, which also clears the iOS corner mask.
+
+         Palette: copy the product's color ROLES by name from its
+         design-system.css (set `designSystem` below to get a drift warning).
+         The values here are the starter's neutral placeholder — warm paper,
+         graphite, indigo — not a recommendation.
+         =================================================================== */
+
+      const R = {
+        canvas: "#f4f2ee",
+        card: "#ffffff",
+        "accent-tint": "#eef0fa",
+        "ink-900": "#1f2126",
+        "accent-interactive": "#4653c8",
+        "accent-decorative": "#7c88e8",
+      };
+      // Dark-theme values of the same roles.
+      const RD = { "ink-900": "#ecedef", "accent-interactive": "#9aa4f0", "accent-decorative": "#4653c8" };
+
+      const concepts = [
+        {
+          id: "monogram",
+          name: "Monogram",
+          direction: "letterform",
+          note: "Placeholder letterform drawn as strokes, not <text> — so it needs no outlining. Replace with the product's initial; run a typeface study first if the letter should come from a real face.",
+          palettes: {
+            light: { bg: R["accent-interactive"], mark: R.card },
+            dark: { bg: null, mark: RD["accent-interactive"] },
+            mono: { mark: "#ffffff" },
+          },
+          art: (p) => `<path d="M352 720 V 304 L 672 720 V 304" fill="none" stroke="${p.mark}" stroke-width="104" stroke-linecap="round" stroke-linejoin="round"/>`,
+        },
+        {
+          id: "symbol",
+          name: "Symbol",
+          direction: "symbol",
+          note: "Placeholder symbol: a sun on a horizon. A symbol should carry the product's idea, not its feature list — one object, one metaphor.",
+          palettes: {
+            light: { bg: R.canvas, sun: R["accent-decorative"], ground: R["ink-900"] },
+            dark: { bg: null, sun: RD["accent-decorative"], ground: RD["ink-900"] },
+            mono: { sun: "#9a9a9a", ground: "#ffffff" },
+          },
+          art: (p) => `
+            <circle cx="512" cy="500" r="190" fill="${p.sun}"/>
+            <rect x="232" y="610" width="560" height="84" rx="42" fill="${p.ground}"/>`,
+        },
+        {
+          id: "abstract",
+          name: "Abstract",
+          direction: "abstract",
+          chosen: true,
+          note: "Placeholder abstract mark: two overlapping discs, the overlap cut out with a mask so it survives dark, tinted and monochrome. Mark exactly one concept chosen: true once the round is decided.",
+          palettes: {
+            light: { bg: R["accent-tint"], a: R["accent-interactive"], b: R["accent-decorative"] },
+            dark: { bg: null, a: RD["accent-interactive"], b: RD["accent-decorative"] },
+            mono: { a: "#ffffff", b: "#8a8a8a" },
+          },
+          art: (p) => `
+            <defs><mask id="cut" maskUnits="userSpaceOnUse" x="-256" y="-256" width="1536" height="1536">
+              <rect x="-256" y="-256" width="1536" height="1536" fill="#fff"/>
+              <circle cx="600" cy="512" r="200" fill="#000"/></mask></defs>
+            <circle cx="424" cy="512" r="200" fill="${p.a}" mask="url(#cut)"/>
+            <circle cx="600" cy="512" r="170" fill="${p.b}"/>`,
+        },
+      ];
+
+      renderIconWorkbench({
+        title: "App icon",
+        intro:
+          "Starter workbench with three placeholder directions. Replace the concepts, palette, and shelf with the product's; every platform section follows the chosen concept (or ?concept=&lt;id&gt;).",
+        appName: "App",
+        roles: R,
+        // designSystem: "../mockup/design-system.css",  // warn when R drifts from the product's roles
+        concepts,
+        // Typeface study — only for letterform directions. System fonts shown
+        // here so the starter renders offline; use webfonts for real studies.
+        typefaces: {
+          glyph: "A",
+          palette: { bg: R.canvas, fg: R["ink-900"] },
+          fonts: [
+            { family: "Georgia", weight: 400 },
+            { family: "Times New Roman", weight: 700 },
+            { family: "Helvetica Neue", weight: 500 },
+            { family: "Avenir Next", weight: 600 },
+          ],
+        },
+        // The field as the user describes it: color + motif families. Labels
+        // describe the tile; never use real app names or marks.
+        shelf: {
+          competitors: [
+            { name: "Blue check", bg: "#2f6fd6", fg: "#ffffff", glyph: "check" },
+            { name: "White bars", bg: "#ffffff", fg: "#3a3d44", glyph: "bars", darkBg: "#2a2a2c" },
+            { name: "Coral ring", bg: "#f06a5a", fg: "#ffffff", glyph: "ring" },
+            { name: "Black B", bg: "#1b1c1f", fg: "#f2f2f2", glyph: "letter:B" },
+            { name: "Mint circle", bg: "#bfe8d6", fg: "#1f6b4f", glyph: "circle", darkBg: "#1d3a2f" },
+            { name: "Violet wave", bg: "#6b4fd8", fg: "#ffffff", glyph: "wave" },
+          ],
+        },
+        pageNotes: [
+          ["How to use this page", "Concepts first, judged at 60 / 29 / 16. Then the shelf. Only the chosen direction goes through the platform sections, and only after it survives them does it get exported (export-icons.sh)."],
+        ],
+      });
+    </script>
+  </body>
+</html>

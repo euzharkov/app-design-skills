@@ -1,0 +1,1397 @@
+/*
+ * window.css — desktop frames for the mockup workbench (window.js). Load
+ * after mockup-core.css. Raw colors are allowed here for the same reason as
+ * in the core: OS chrome (traffic lights, caption buttons, menu bar,
+ * taskbar, wallpaper) is workbench, not product. Everything the PRODUCT
+ * owns inside a frame resolves from design-system.css roles.
+ *
+ * Platform metrics live under .p-macos / .p-windows. Numbers are production
+ * points, 1:1 at the window's declared size.
+ */
+
+/* Desktop columns carry wider frames, so their labels may run wider. */
+.col:has(.dframe) {
+  --label-max: 620px;
+}
+
+/* ---- frame-derived chrome values ----
+   Not product values: tints and surfaces the OS would draw, derived from the
+   product's roles so they follow light/dark automatically. A page may
+   override any of them in its Layer-2 CSS (e.g. --win-sidebar: var(--canvas))
+   — and if a derived surface carries text that matters, promote it to a real
+   role in design-system.css so the contrast audit can see it. */
+.screen {
+  --win-bg: var(--canvas);
+  --win-sidebar: color-mix(in srgb, var(--ink-900) 4%, var(--canvas));
+  --win-hairline: color-mix(in srgb, var(--ink-900) 13%, transparent);
+  --win-hover: color-mix(in srgb, var(--ink-900) 6%, transparent);
+  --win-select: color-mix(in srgb, var(--ink-900) 9%, transparent);
+  --win-well: color-mix(in srgb, var(--ink-900) 7%, transparent);
+  --win-accent: var(--accent-interactive);
+  --win-on-accent: var(--btn-label);
+  --win-raise: var(--card);
+  --win-popover: var(--card);
+  --win-ring: color-mix(in srgb, var(--ink-900) 16%, transparent);
+}
+.theme-dark .screen,
+.screen.night {
+  --win-raise: color-mix(in srgb, var(--ink-900) 11%, var(--card));
+  --win-popover: color-mix(in srgb, var(--ink-900) 6%, var(--card));
+  --win-ring: color-mix(in srgb, var(--ink-900) 14%, transparent);
+}
+
+.p-macos {
+  --w-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --win-radius: 14px;
+}
+.p-windows {
+  --w-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --win-radius: 8px;
+}
+
+/* ---- frame meta line (size / min size, for handoff) ---- */
+.w-meta {
+  align-self: flex-start;
+  font: 11.5px ui-monospace, Menlo, monospace;
+  color: #8a8c93;
+  margin-bottom: -4px;
+}
+
+/* ================= the window ================= */
+.win {
+  position: relative;
+  border-radius: var(--win-radius);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.24),
+    0 24px 70px -12px rgba(30, 26, 20, 0.38),
+    0 6px 18px -6px rgba(30, 26, 20, 0.18);
+  flex: 0 0 auto;
+}
+.win.p-windows {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 26px 64px -16px rgba(0, 0, 0, 0.36);
+}
+.win.inactive {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.2),
+    0 12px 30px -10px rgba(30, 26, 20, 0.22);
+}
+.win > .wscreen {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--win-bg);
+  display: flex;
+  font-family: var(--w-font);
+}
+.win.autoh > .wscreen {
+  height: auto;
+}
+.win.p-windows > .wscreen {
+  flex-direction: column;
+  background: var(--win-sidebar);
+}
+/* Dark windows draw a faint light edge inside the dark hairline. */
+.theme-dark .win > .wscreen::after,
+.win > .wscreen.night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  z-index: 60;
+}
+
+/* ---- macOS: lights, title bar, unified toolbar ---- */
+.w-lights {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.w-lights span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.14);
+}
+.w-lights .tl-close { background: #ff5f57; }
+.w-lights .tl-min { background: #febc2e; }
+.w-lights .tl-zoom { background: #28c840; }
+.w-lights .tl-off,
+.w-lights.inactive span {
+  background: rgba(0, 0, 0, 0.1);
+}
+.theme-dark .w-lights .tl-off,
+.theme-dark .w-lights.inactive span,
+.night .w-lights .tl-off,
+.night .w-lights.inactive span {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.w-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.p-macos .w-titlebar {
+  height: 32px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 12px;
+  position: relative;
+  z-index: 5;
+}
+.p-macos .w-titlebar .w-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: 600 13px/16px var(--w-font);
+  color: var(--ink-900);
+  opacity: 0.85;
+  pointer-events: none;
+}
+/* Unified toolbar: 52 pt, title leads at the left, items trail. */
+.p-macos .w-titlebar.unified {
+  height: 52px;
+  padding: 0 12px 0 20px;
+}
+.p-macos .w-titlebar.unified .w-title {
+  position: static;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 18px;
+  opacity: 1;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+}
+.p-macos .w-titlebar.unified .w-title small {
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 400;
+  color: var(--ink-600);
+}
+.p-macos .w-toolbar {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.win.inactive .w-title {
+  opacity: 0.5 !important;
+}
+
+/* ---- macOS sidebar: full height, lights inside ---- */
+.p-macos .w-side {
+  flex: 0 0 var(--win-sidebar-w);
+  width: var(--win-sidebar-w);
+  background: var(--win-sidebar);
+  border-right: 0.5px solid var(--win-hairline);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--win-radius) 0 0 var(--win-radius);
+  min-height: 0;
+}
+/* Current macOS: the sidebar floats as an inset glass panel. */
+.p-macos .w-side.inset {
+  margin: 8px 0 8px 8px;
+  border-radius: calc(var(--win-radius) - 4px);
+  border-right: 0;
+  box-shadow:
+    0 0 0 0.5px var(--win-hairline),
+    0 4px 14px -6px rgba(0, 0, 0, 0.14);
+}
+.p-macos .w-side-top {
+  height: 32px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+}
+.p-macos .w-side-top.unified {
+  height: 52px;
+  padding: 0 20px;
+}
+.p-macos .w-side.inset .w-side-top.unified {
+  height: 44px;
+  padding: 0 12px;
+}
+.w-side-body {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ---- content region ---- */
+.w-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.w-body.pad {
+  padding: var(--space-4, 16px) var(--screen-inset, 20px);
+}
+.w-body.scrolly {
+  overflow-y: auto;
+}
+.w-body.scrolly::-webkit-scrollbar {
+  width: 0;
+}
+.w-status {
+  flex: 0 0 auto;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-top: 0.5px solid var(--win-hairline);
+  font: 11px/14px var(--w-font);
+  color: var(--ink-600);
+}
+
+/* ---- Windows 11: title bar, caption buttons, menus, command bar ---- */
+.p-windows .w-titlebar {
+  height: 32px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  gap: 12px;
+  font: 12px/16px var(--w-font);
+  color: var(--ink-900);
+}
+.p-windows .w-ticon {
+  display: flex;
+}
+.p-windows .w-ticon .w-appicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.p-windows .w-title {
+  white-space: nowrap;
+}
+.win.inactive.p-windows .w-titlebar {
+  color: var(--ink-400);
+}
+.p-windows .w-tb-mid {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.w-caps {
+  display: flex;
+  align-self: stretch;
+}
+.w-cap {
+  width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-900);
+}
+.w-cap svg {
+  display: block;
+}
+.w-cap.cap-off {
+  opacity: 0.35;
+}
+.w-cap.cap-close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+.p-windows .w-menus {
+  display: flex;
+  gap: 2px;
+  padding: 0 6px 4px;
+  font: 14px/20px var(--w-font);
+  color: var(--ink-900);
+}
+.p-windows .w-menus span {
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.p-windows .w-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  padding: 0 12px;
+  flex: 0 0 auto;
+}
+.p-windows .w-split {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.p-windows .w-side {
+  flex: 0 0 var(--win-sidebar-w);
+  width: var(--win-sidebar-w);
+  padding: 4px 0 8px;
+  overflow: hidden;
+}
+/* Content sits on a raised layer over the Mica base; with a navigation pane
+   its top-left corner rounds into the pane. */
+.p-windows .w-layer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--win-bg);
+  border-top: 1px solid var(--win-hairline);
+  border-left: 1px solid var(--win-hairline);
+  border-top-left-radius: 8px;
+  border-bottom-right-radius: var(--win-radius);
+}
+.p-windows .w-split.solo .w-layer {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: var(--win-radius);
+}
+.p-windows .w-pagehead {
+  font: 600 28px/36px var(--w-font);
+  color: var(--ink-900);
+  margin: 8px 0 20px;
+}
+
+/* ---- sidebar / navigation rows ---- */
+.w-nav {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+}
+.p-macos .w-nav {
+  padding: 2px 10px;
+  gap: 1px;
+}
+.w-nav-h {
+  font: 600 11px/14px var(--w-font);
+  color: var(--ink-400);
+  padding: 14px 8px 5px;
+}
+.w-nav-h:first-child {
+  padding-top: 4px;
+}
+.w-nav-i {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--ink-900);
+  position: relative;
+}
+.w-nav-i.on {
+  background: var(--win-select);
+}
+.w-nav-ic {
+  width: 18px;
+  display: flex;
+  justify-content: center;
+  color: var(--win-accent);
+  font-size: 15px;
+}
+.w-nav-l {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.w-nav-b {
+  font-size: 12px;
+  color: var(--ink-400);
+  font-variant-numeric: tabular-nums;
+}
+.p-windows .w-nav {
+  padding: 0 4px;
+  gap: 4px;
+}
+.p-windows .w-nav-h {
+  font: 600 14px/20px var(--w-font);
+  color: var(--ink-900);
+  padding: 12px 12px 4px;
+}
+.p-windows .w-nav-i {
+  height: 36px;
+  padding: 0 12px;
+  gap: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.p-windows .w-nav-ic {
+  color: var(--ink-900);
+  font-size: 16px;
+}
+.p-windows .w-nav-i.on {
+  background: var(--win-hover);
+}
+.p-windows .w-nav-i.on::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--win-accent);
+}
+
+/* ---- overlay: sheets, dialogs, menus, cursors over a window ---- */
+.w-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: inherit;
+}
+.w-overlay:not([class*="scrim-"]) {
+  display: block;
+  pointer-events: none;
+}
+.w-overlay.at-top {
+  align-items: flex-start;
+  padding-top: 60px;
+}
+.w-overlay.scrim-sheet {
+  background: rgba(0, 0, 0, 0.1);
+}
+.w-overlay.scrim-dialog {
+  background: rgba(0, 0, 0, 0.3);
+}
+.theme-dark .w-overlay.scrim-sheet,
+.night > .w-overlay.scrim-sheet {
+  background: rgba(0, 0, 0, 0.3);
+}
+.theme-dark .w-overlay.scrim-dialog,
+.night > .w-overlay.scrim-dialog {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* macOS sheet */
+.w-sheet {
+  background: var(--win-bg);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.25),
+    0 20px 50px -10px rgba(0, 0, 0, 0.35);
+  font-family: var(--w-font);
+  color: var(--ink-900);
+}
+.theme-dark .w-sheet,
+.night .w-sheet {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 20px 50px -10px rgba(0, 0, 0, 0.6);
+}
+.w-dlg-title {
+  font: 700 13px/16px var(--w-font);
+  color: var(--ink-900);
+  margin-bottom: 6px;
+}
+
+/* Windows ContentDialog */
+.w-dialog {
+  background: var(--win-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 32px 64px -12px rgba(0, 0, 0, 0.35);
+  font-family: var(--w-font);
+  color: var(--ink-900);
+}
+.theme-dark .w-dialog,
+.night .w-dialog {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 32px 64px -12px rgba(0, 0, 0, 0.6);
+}
+.w-dlg-body {
+  padding: 24px;
+}
+.w-dialog .w-dlg-title {
+  font: 600 20px/28px var(--w-font);
+  margin-bottom: 12px;
+}
+.w-dlg-text {
+  font: 14px/20px var(--w-font);
+  color: var(--ink-900);
+}
+
+/* dialog button rows */
+.w-actions {
+  display: flex;
+  gap: 8px;
+}
+.w-actions.mac {
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.w-actions.win {
+  padding: 24px;
+  background: var(--win-sidebar);
+  border-top: 1px solid var(--win-hairline);
+}
+.w-actions.win .wc-btn {
+  flex: 1;
+}
+
+/* macOS alert */
+.w-alert {
+  width: 260px;
+  background: var(--win-popover);
+  border-radius: 14px;
+  padding: 20px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.25),
+    0 22px 60px -10px rgba(0, 0, 0, 0.4);
+}
+.theme-dark .w-alert,
+.night .w-alert {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 22px 60px -10px rgba(0, 0, 0, 0.6);
+}
+.w-alert-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.w-alert-icon .w-appicon {
+  width: 56px;
+  height: 56px;
+  border-radius: 13px;
+}
+.w-alert-title {
+  font: 700 13px/16px var(--w-font);
+}
+.w-alert-body {
+  font: 11px/14px var(--w-font);
+  margin-top: 6px;
+  color: var(--ink-900);
+}
+.w-alert-sup {
+  margin-top: 12px;
+  align-self: flex-start;
+}
+.w-alert-btns {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+}
+.w-alert-btns.stacked {
+  flex-direction: column;
+}
+.w-alert-btns .wc-btn {
+  flex: 1;
+}
+
+/* ---- settings window (macOS pane tabs) ---- */
+.w-ptabs {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 12px 8px;
+  border-bottom: 0.5px solid var(--win-hairline);
+  flex: 0 0 auto;
+}
+.w-ptab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  padding: 5px 8px 4px;
+  border-radius: 8px;
+  font: 11px/13px var(--w-font);
+  color: var(--ink-600);
+}
+.w-ptab > :first-child:not(span:only-child) {
+  font-size: 22px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+.w-ptab.on {
+  background: var(--win-select);
+  color: var(--win-accent);
+}
+.w-ptab.on span {
+  color: var(--ink-900);
+}
+.w-pbody {
+  padding: 20px var(--screen-inset, 20px) 24px;
+}
+
+/* ================= native controls ================= */
+.wc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+  background: var(--win-raise);
+  user-select: none;
+}
+.wc-btn.wide {
+  width: 100%;
+}
+.p-macos .wc-btn {
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  box-shadow:
+    0 0 0 0.5px var(--win-ring),
+    0 0.5px 1.5px rgba(0, 0, 0, 0.1);
+}
+.p-macos .w-alert .wc-btn {
+  height: 28px;
+}
+.p-windows .wc-btn {
+  height: 32px;
+  padding: 0 12px;
+  min-width: 96px;
+  border-radius: 4px;
+  font-size: 14px;
+  border: 1px solid var(--win-ring);
+  border-bottom-color: color-mix(in srgb, var(--ink-900) 26%, transparent);
+}
+.wc-btn.k-default {
+  background: var(--win-accent);
+  color: var(--win-on-accent);
+  font-weight: 500;
+}
+.p-windows .wc-btn.k-default {
+  border-color: transparent;
+}
+.wc-btn.k-danger {
+  color: var(--danger);
+  font-weight: 500;
+}
+.wc-btn.k-plain {
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
+  color: var(--win-accent);
+  padding: 0 4px;
+  min-width: 0;
+}
+.wc-btn.s-hover {
+  filter: brightness(0.96);
+}
+.theme-dark .wc-btn.s-hover,
+.night .wc-btn.s-hover {
+  filter: brightness(1.15);
+}
+.wc-btn.s-pressed {
+  filter: brightness(0.9);
+}
+.wc-btn.s-disabled {
+  opacity: 0.45;
+}
+.wc-btn.s-focus {
+  outline: 3px solid color-mix(in srgb, var(--win-accent) 50%, transparent);
+  outline-offset: 1px;
+}
+.p-windows .wc-btn.s-focus {
+  outline: 2px solid var(--ink-900);
+  outline-offset: 2px;
+}
+
+/* switch */
+.wc-toggle {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 auto;
+  background: var(--win-well);
+  border-radius: 999px;
+}
+.wc-toggle i {
+  position: absolute;
+  border-radius: 999px;
+  background: #fff;
+}
+.p-macos .wc-toggle {
+  width: 32px;
+  height: 18px;
+  box-shadow: inset 0 0 0 0.5px var(--win-ring);
+}
+.p-macos .wc-toggle i {
+  width: 16px;
+  height: 16px;
+  top: 1px;
+  left: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.p-macos .wc-toggle.on i {
+  left: 15px;
+}
+.wc-toggle.on {
+  background: var(--win-accent);
+  box-shadow: none;
+}
+.p-windows .wc-toggle {
+  width: 40px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid var(--ink-600);
+}
+.p-windows .wc-toggle i {
+  width: 12px;
+  height: 12px;
+  top: 3px;
+  left: 3px;
+  background: var(--ink-600);
+}
+.p-windows .wc-toggle.on {
+  background: var(--win-accent);
+  border-color: transparent;
+}
+.p-windows .wc-toggle.on i {
+  left: 23px;
+  background: var(--win-on-accent);
+}
+
+/* checkbox, radio */
+.wc-check,
+.wc-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+}
+.p-macos .wc-check,
+.p-macos .wc-radio {
+  font-size: 13px;
+}
+.p-windows .wc-check,
+.p-windows .wc-radio {
+  font-size: 14px;
+  gap: 8px;
+}
+.wc-check i,
+.wc-radio i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  background: var(--win-raise);
+  box-shadow: inset 0 0 0 1px var(--win-ring);
+  color: var(--win-on-accent);
+}
+.p-macos .wc-check i {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.p-windows .wc-check i {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--ink-600);
+}
+.wc-check.on i,
+.wc-radio.on i {
+  background: var(--win-accent);
+  box-shadow: none;
+}
+.wc-radio i {
+  border-radius: 50%;
+}
+.p-macos .wc-radio i {
+  width: 14px;
+  height: 14px;
+}
+.p-windows .wc-radio i {
+  width: 20px;
+  height: 20px;
+  box-shadow: inset 0 0 0 1px var(--ink-600);
+}
+.wc-radio.on i::after {
+  content: "";
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: var(--win-on-accent);
+}
+
+/* pop-up button / combo box, text field, search field */
+.wc-popup,
+.wc-field,
+.wc-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+  white-space: nowrap;
+  position: relative;
+}
+.wc-popup > span,
+.wc-field > span,
+.wc-search > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wc-field .wc-ph,
+.wc-search .wc-ph {
+  color: var(--ink-400);
+}
+.wc-pop-g,
+.wc-search > b {
+  display: flex;
+  color: var(--ink-600);
+  font-weight: inherit;
+}
+.p-macos .wc-popup {
+  height: 24px;
+  padding: 0 7px 0 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--win-raise);
+  box-shadow:
+    0 0 0 0.5px var(--win-ring),
+    0 0.5px 1.5px rgba(0, 0, 0, 0.1);
+}
+.p-macos .wc-field {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--win-raise);
+  box-shadow: inset 0 0 0 0.5px var(--win-ring);
+  min-width: 160px;
+}
+.p-macos .wc-search {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--win-raise);
+  box-shadow:
+    0 0 0 0.5px var(--win-ring),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  min-width: 200px;
+}
+.p-macos .s-focus {
+  box-shadow:
+    0 0 0 0.5px var(--win-accent),
+    0 0 0 3.5px color-mix(in srgb, var(--win-accent) 40%, transparent);
+}
+.p-windows .wc-popup,
+.p-windows .wc-field,
+.p-windows .wc-search {
+  height: 32px;
+  padding: 0 11px;
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--win-raise);
+  border: 1px solid var(--win-ring);
+  border-bottom-color: color-mix(in srgb, var(--ink-900) 40%, transparent);
+  min-width: 160px;
+}
+.p-windows .wc-search {
+  flex-direction: row-reverse;
+  min-width: 240px;
+}
+.p-windows .s-focus {
+  border-bottom: 2px solid var(--win-accent);
+}
+.wc-field .caret,
+.wc-search .caret {
+  position: absolute;
+  width: 1px;
+  height: 15px;
+  background: var(--ink-900);
+  display: none;
+}
+.wc-field.s-focus .caret {
+  display: block;
+  position: static;
+  margin-left: -5px;
+}
+.wc-field.s-focus > span,
+.wc-search.s-focus > span {
+  flex: 0 1 auto;
+}
+.wc-search.s-focus .caret {
+  display: block;
+  position: static;
+  margin-left: -5px;
+}
+
+/* segmented control */
+.wc-seg {
+  display: inline-flex;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.p-macos .wc-seg {
+  background: var(--win-well);
+  border-radius: 999px;
+  padding: 2px;
+  font-size: 13px;
+}
+.p-macos .wc-seg span {
+  padding: 2px 12px;
+  border-radius: 999px;
+}
+.p-macos .wc-seg span.on {
+  background: var(--win-raise);
+  box-shadow:
+    0 0 0 0.5px var(--win-ring),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.p-windows .wc-seg {
+  gap: 4px;
+  font-size: 14px;
+}
+.p-windows .wc-seg span {
+  padding: 6px 12px;
+  border-radius: 4px;
+  position: relative;
+  color: var(--ink-600);
+}
+.p-windows .wc-seg span.on {
+  color: var(--ink-900);
+  font-weight: 600;
+}
+.p-windows .wc-seg span.on::after {
+  content: "";
+  position: absolute;
+  left: 40%;
+  right: 40%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--win-accent);
+}
+
+/* toolbar item */
+.wc-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--ink-600);
+  font-family: var(--w-font);
+  white-space: nowrap;
+}
+.p-macos .wc-tool {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 16px;
+  background: var(--win-raise);
+  box-shadow:
+    0 0 0 0.5px var(--win-ring),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.p-macos .wc-tool.lab {
+  padding: 0 12px;
+  font-size: 15px;
+}
+.p-macos .wc-tool.lab span {
+  font-size: 13px;
+  color: var(--ink-900);
+}
+.p-windows .wc-tool {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  font-size: 16px;
+  color: var(--ink-900);
+}
+.p-windows .wc-tool.lab {
+  padding: 0 10px;
+}
+.p-windows .wc-tool.lab span {
+  font-size: 14px;
+}
+.wc-tool.on {
+  color: var(--win-accent);
+}
+.wc-tool.s-hover {
+  background: var(--win-hover);
+}
+.p-macos .wc-tool.s-hover {
+  background: color-mix(in srgb, var(--ink-900) 5%, var(--win-raise));
+  color: var(--ink-900);
+}
+
+/* ================= menus, tooltips, cursor ================= */
+.w-menu.screen {
+  background: var(--win-popover);
+  overflow: visible;
+  font-family: var(--w-font);
+  color: var(--ink-900);
+}
+.w-menu.p-macos {
+  border-radius: 10px;
+  padding: 5px;
+  font-size: 13px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.22),
+    0 10px 30px -6px rgba(0, 0, 0, 0.3);
+}
+.w-menu.p-windows {
+  border-radius: 8px;
+  padding: 4px;
+  font-size: 14px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.14);
+}
+.theme-dark .w-menu,
+.w-menu.night,
+.night .w-menu {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 10px 30px -6px rgba(0, 0, 0, 0.6);
+}
+.w-menu-i {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.w-menu.p-macos .w-menu-i {
+  height: 22px;
+  padding: 0 10px 0 4px;
+  border-radius: 5px;
+}
+.w-menu.p-windows .w-menu-i {
+  height: 32px;
+  padding: 0 12px 0 4px;
+  border-radius: 4px;
+}
+.w-menu-ck {
+  width: 18px;
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.w-menu-ic {
+  width: 20px;
+  display: flex;
+  margin-right: 4px;
+  color: var(--ink-600);
+}
+.w-menu-l {
+  flex: 1;
+  padding-right: 24px;
+}
+.w-menu-k {
+  color: var(--ink-400);
+  display: flex;
+  align-items: center;
+}
+.w-menu.p-macos .w-menu-k {
+  letter-spacing: 0.06em;
+}
+.w-menu.p-macos .w-menu-i.hi {
+  background: var(--win-accent);
+  color: var(--win-on-accent);
+}
+.w-menu.p-macos .w-menu-i.hi .w-menu-k,
+.w-menu.p-macos .w-menu-i.hi .w-menu-ic {
+  color: inherit;
+  opacity: 0.85;
+}
+.w-menu.p-windows .w-menu-i.hi {
+  background: var(--win-hover);
+}
+.w-menu-i.off {
+  opacity: 0.4;
+}
+.w-menu-i.danger .w-menu-l {
+  color: var(--danger);
+}
+.w-menu-i.danger.hi .w-menu-l {
+  color: inherit;
+}
+.w-menu-sep {
+  height: 1px;
+  background: var(--win-hairline);
+}
+.w-menu.p-macos .w-menu-sep {
+  margin: 5px 10px;
+}
+.w-menu.p-windows .w-menu-sep {
+  margin: 4px -4px;
+}
+.w-menu-h {
+  font: 600 11px/14px var(--w-font);
+  color: var(--ink-400);
+  padding: 6px 10px 3px 22px;
+}
+
+.w-tip.screen {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--win-popover);
+  overflow: visible;
+  color: var(--ink-900);
+  white-space: nowrap;
+  font-family: var(--w-font);
+}
+.w-tip.p-macos {
+  font-size: 11px;
+  line-height: 14px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.2),
+    0 3px 10px -2px rgba(0, 0, 0, 0.2);
+}
+.w-tip.p-windows {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.14);
+}
+.w-tip-k {
+  color: var(--ink-400);
+}
+
+.w-cursor {
+  position: absolute;
+  z-index: 80;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+.w-cursor svg {
+  display: block;
+}
+
+/* Placeholder app icon / status glyph (replace with the product's own). */
+.w-appicon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: linear-gradient(160deg, var(--accent-decorative), var(--accent-interactive));
+}
+.w-glyph-ph {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1.6px solid currentColor;
+}
+
+/* ================= desktop stage: wallpaper, menu bar, taskbar ================= */
+.dstage {
+  position: relative;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #cdd6dc 0%, #dcd5c9 55%, #e6ddd0 100%);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+.theme-dark .dstage,
+.dstage.night {
+  background: linear-gradient(160deg, #1d252b 0%, #26231f 60%, #2b2620 100%);
+}
+.dstage.bare {
+  padding: 40px 48px;
+  align-items: center;
+}
+.dstage.p-windows {
+  justify-content: flex-end;
+}
+.w-float.screen {
+  background: transparent;
+  overflow: visible;
+}
+
+.d-menubar {
+  height: 24px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  font: 13px/16px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: #1d1d1f;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 12px 12px 0 0;
+}
+.theme-dark .d-menubar,
+.dstage.night .d-menubar {
+  color: #f2f2f2;
+  background: rgba(0, 0, 0, 0.35);
+}
+.mb-gap {
+  flex: 1;
+}
+.mb-item,
+.mb-menu {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 5px;
+}
+.mb-item svg {
+  display: block;
+}
+.mb-item.on,
+.mb-menu.on {
+  background: rgba(0, 0, 0, 0.12);
+}
+.theme-dark .mb-item.on,
+.theme-dark .mb-menu.on,
+.dstage.night .mb-item.on,
+.dstage.night .mb-menu.on {
+  background: rgba(255, 255, 255, 0.2);
+}
+.mb-menu.app {
+  font-weight: 700;
+}
+.mb-menu {
+  position: relative;
+}
+.mb-drop {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  z-index: 10;
+  font-weight: 400;
+}
+.mb-clock {
+  font-variant-numeric: tabular-nums;
+}
+.d-anchor {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 10px 40px;
+}
+.p-windows .d-anchor {
+  padding: 40px 12px 12px;
+}
+.w-panel.screen {
+  background: var(--win-popover);
+  font-family: var(--w-font);
+  display: flex;
+  flex-direction: column;
+}
+.w-panel.pad {
+  padding: 14px;
+}
+.p-macos .w-panel {
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.22),
+    0 16px 40px -8px rgba(0, 0, 0, 0.35);
+}
+.p-macos .w-panel.arrow {
+  overflow: visible;
+}
+.p-macos .w-panel.arrow::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 40px;
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  transform: rotate(45deg);
+  border-radius: 3px 0 0 0;
+  box-shadow: -0.5px -0.5px 0 0 rgba(0, 0, 0, 0.12);
+}
+.p-windows .w-panel {
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 16px 40px -8px rgba(0, 0, 0, 0.35);
+}
+.theme-dark .w-panel,
+.w-panel.night {
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 16px 40px -8px rgba(0, 0, 0, 0.6);
+}
+.d-taskbar {
+  height: 48px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  font: 12px/16px "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: #1b1b1b;
+  background: rgba(243, 243, 243, 0.82);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0 0 12px 12px;
+}
+.theme-dark .d-taskbar,
+.dstage.night .d-taskbar {
+  color: #f2f2f2;
+  background: rgba(32, 32, 32, 0.85);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.tb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 4px;
+}
+.tb-item.on {
+  background: rgba(0, 0, 0, 0.06);
+}
+.theme-dark .tb-item.on,
+.dstage.night .tb-item.on {
+  background: rgba(255, 255, 255, 0.08);
+}
+.tb-clock {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+}

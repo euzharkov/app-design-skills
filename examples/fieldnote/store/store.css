@@ -1,0 +1,374 @@
+/*
+ * store.css — store-listing frames for the mockup workbench.
+ *
+ * Load after design-system.css, mockup-core.css and the device frame files
+ * (phone.css, window.css). Every product color, family and radius comes from
+ * design-system.css roles: a store frame is the product's own surface, not a
+ * new art direction. The var() fallbacks only exist so the starter renders
+ * before a design system is linked.
+ *
+ * Authoring sizes (the export multiplies by an integer scale, then resamples
+ * to the exact store size — never shrink the capture window instead):
+ *
+ *   .shot           440×956   iPhone portrait   ×3 → 1320×2868
+ *   .shot.android   440×782   Play phone 9:16   ×3 → 1320×2346 → 1080×1920
+ *   .subshot        512×512   IAP promo square  ×2 → 1024×1024
+ *   .featshot       512×250   Play feature      ×2 → 1024×500
+ *   .macshot        1440×900  Mac 16:10         ×2 → 2880×1800
+ *
+ * Each frame also carries the class "screen", so design-system.css's dark
+ * block (.theme-dark .screen, .screen.night) re-resolves the roles on the
+ * frame itself: a night shot darkens its background, its copy AND the device
+ * inside it (the device's screen inherits the frame's values).
+ *
+ * Raw colors appear here only for shadows — workbench, not product.
+ */
+
+/* ================= shared frame anatomy ================= */
+
+.shot,
+.subshot,
+.featshot,
+.macshot {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  /* The plain role is what the contrast audit measures text against; the
+     wash is decoration layered on top and must stay close to it. */
+  background-color: var(--shot-bg, var(--canvas, #f4f2ee));
+  background-image: var(--shot-wash, none);
+  color: var(--ink-900, #1f2023);
+  border-radius: 12px; /* preview only; export mode squares the corners */
+  box-shadow: 0 14px 40px -18px rgba(30, 28, 22, 0.45);
+}
+
+/* Soft decorative shape behind the device: a tint from the palette, never a
+   new hue. Pages may reposition or restyle it per frame. */
+.shot .glow,
+.macshot .glow,
+.featshot .glow,
+.subshot .glow {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent-tint, #e7e9f3);
+  pointer-events: none;
+}
+
+/* ================= phone shots ================= */
+
+.shot {
+  --shot-w: 440px;
+  --shot-h: 956px;
+  --copy-h: 236px;
+  width: var(--shot-w);
+  height: var(--shot-h);
+}
+.shot.android {
+  --shot-h: 782px; /* 9:16 — the only phone aspect Play accepts */
+}
+.shot .glow {
+  width: 620px;
+  height: 620px;
+  left: 50%;
+  top: calc(var(--copy-h) + 120px);
+  transform: translateX(-50%);
+}
+
+/* The copy block is a fixed-height band so every eyebrow and headline in the
+   set starts on the same line — the rail reads as one family. */
+.shot .copy {
+  position: relative;
+  z-index: 3;
+  height: var(--copy-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 54px 34px 0;
+}
+.store-eyebrow {
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-weight: var(--weight-semibold, 600);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-interactive, #3d4fa8);
+  margin-bottom: 14px;
+}
+/* Marketing headline: the display family at poster size. These sizes are
+   deliberately outside the product's type ramp — a store frame is read as a
+   thumbnail — but the family, weight and color are the product's roles. */
+.store-headline {
+  font-family: var(--font-display, var(--font-body, system-ui, sans-serif));
+  font-weight: var(--weight-semibold, 600);
+  font-size: 33px;
+  line-height: 38px;
+  letter-spacing: -0.015em;
+  color: var(--ink-900, #1f2023);
+  text-wrap: balance;
+}
+.store-caption {
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-weight: var(--weight-regular, 400);
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--ink-600, #4a4c52);
+  margin-top: 12px;
+  max-width: 340px;
+  text-wrap: balance;
+}
+
+/* Hero: poster scale, left-aligned, taller copy band. Only the first frame. */
+.shot.hero {
+  --copy-h: 286px;
+}
+.shot.hero .copy {
+  align-items: flex-start;
+  text-align: left;
+  padding: 50px 36px 0;
+}
+.shot.hero .store-headline {
+  font-size: 46px;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+}
+.shot.hero .store-caption {
+  margin-top: 16px;
+}
+
+/* Stage: where the device sits. The holder scales the frame (default 1 —
+   the device bleeds off the bottom edge, which reads as "there is more").
+   Pages set --device-scale / --device-y per shot via store.js. */
+.shot .stage {
+  position: absolute;
+  top: var(--copy-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+}
+.shot .stage .holder {
+  margin-top: var(--device-y, 6px);
+  transform: scale(var(--device-scale, 1));
+  transform-origin: top center;
+  height: max-content;
+}
+/* Fallback so the starter's device reads before design-system.css exists. */
+.shot .phone > .screen {
+  background-color: var(--canvas, #f4f2ee);
+  color: var(--ink-900, #1f2023);
+}
+/* Device shadow tuned for a frame, not the gallery canvas. */
+.shot .phone {
+  box-shadow:
+    0 30px 60px -24px rgba(20, 18, 14, 0.45),
+    0 0 0 2px rgba(0, 0, 0, 0.9);
+}
+
+/* Free slot for a breakout element (a zoomed card, a quote) positioned by the
+   page. It sits above the device so the key detail survives thumbnail size. */
+.shot .overlay,
+.macshot .overlay {
+  position: absolute;
+  z-index: 4;
+}
+
+/* ================= Mac shots (16:10) ================= */
+
+.macshot {
+  --copy-h: 196px;
+  width: 1440px;
+  height: 900px;
+}
+.macshot .glow {
+  width: 1500px;
+  height: 900px;
+  left: 50%;
+  top: 300px;
+  transform: translateX(-50%);
+}
+.macshot .copy {
+  position: relative;
+  z-index: 3;
+  height: var(--copy-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 62px 120px 0;
+}
+.macshot .store-headline {
+  font-size: 46px;
+  line-height: 52px;
+}
+.macshot .store-caption {
+  font-size: 20px;
+  line-height: 28px;
+  max-width: 760px;
+}
+.macshot .stage {
+  position: absolute;
+  top: var(--copy-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+}
+.macshot .stage .holder {
+  margin-top: var(--device-y, 10px);
+  transform: scale(var(--device-scale, 1));
+  transform-origin: top center;
+  height: max-content;
+}
+
+/* ================= IAP promo square ================= */
+
+/* Stores show this at roughly 60pt beside their own price and billing text:
+   one big word, one short tag, no wordmark (the app name prints beside it). */
+.subshot {
+  width: 512px;
+  height: 512px;
+}
+.subshot .glow {
+  width: 560px;
+  height: 560px;
+  left: 50%;
+  top: 330px;
+  transform: translateX(-50%);
+}
+.subshot .subcopy {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 28px 40px;
+}
+.subshot .subglyph {
+  color: var(--accent-interactive, #3d4fa8);
+  margin-bottom: 6px;
+  line-height: 0;
+}
+.subshot .subglyph svg {
+  width: 72px;
+  height: 72px;
+}
+.subshot .subglyph i {
+  font-size: 72px; /* icon-font glyphs (the project's icon library) */
+}
+.subshot .subword {
+  font-family: var(--font-display, var(--font-body, system-ui, sans-serif));
+  font-weight: var(--weight-semibold, 600);
+  font-size: 176px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink-900, #1f2023);
+}
+.subshot .subword.long {
+  font-size: 120px;
+}
+.subshot .subtag {
+  margin-top: 18px;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-weight: var(--weight-semibold, 600);
+  font-size: 34px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-interactive, #3d4fa8);
+}
+/* Gallery-only twin at the size the store renders it. */
+.subshot.thumb {
+  zoom: 0.125;
+  border-radius: 96px; /* 12px rendered */
+}
+
+/* ================= Play feature graphic ================= */
+
+/* 1024×500, authored at 512×250. Play crops it and may lay a play button
+   over the center: keep the promise in the left half and inside a 24px safe
+   inset; no device screenshots, no small text. */
+.featshot {
+  width: 512px;
+  height: 250px;
+}
+.featshot .glow {
+  width: 420px;
+  height: 420px;
+  right: -110px;
+  top: -60px;
+}
+.featshot .featcopy {
+  position: absolute;
+  z-index: 3;
+  left: 36px;
+  top: 0;
+  bottom: 0;
+  width: 270px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.featshot .featmark {
+  font-family: var(--font-display, var(--font-body, system-ui, sans-serif));
+  font-weight: var(--weight-semibold, 600);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--accent-interactive, #3d4fa8);
+  margin-bottom: 10px;
+}
+.featshot .store-headline {
+  font-size: 29px;
+  line-height: 32px;
+  text-align: left;
+}
+.featshot .featart {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+}
+
+/* ================= gallery chrome ================= */
+
+/* Frames are wider than the phone baseline, so labels follow the frame. */
+.col:has(.shot) {
+  --label-max: 440px;
+}
+.col:has(.macshot) {
+  --label-max: 900px;
+}
+.store-audit td.bad {
+  color: #a8332a;
+  font-weight: 600;
+}
+
+/* ================= export mode ================= */
+
+/* ?shot=N / ?sub=N / ?feature / ?mac=N: exactly one frame at the page origin,
+   square-cornered, no page chrome. Headless Chrome captures it with
+   --window-size equal to the authoring size. */
+body.exporting {
+  padding: 0;
+  margin: 0;
+  background: none;
+  overflow: hidden;
+}
+body.exporting > .shot,
+body.exporting > .subshot,
+body.exporting > .featshot,
+body.exporting > .macshot {
+  border-radius: 0;
+  box-shadow: none;
+  zoom: 1;
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flow</title>
+    <!-- Keep the head identical to index.html (fonts, icons, all stylesheets)
+         so every page shares one design system. -->
+    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="window.css" />
+    <!-- Swap for the icon source chosen during discovery (see DESIGN-SYSTEM.md). -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style>
+      /* Layer 2: screen CSS for this page only. Compose freely, but take
+         every color, size, radius, and space from design-system values. */
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script src="mockup-core.js"></script>
+    <script src="window.js"></script>
+    <script>
+      /* WINDOW_PLATFORM = "windows"; — set once if this page is Windows-first. */
+
+      renderMockupPage({
+        title: "PRODUCT — WINDOW AREA",
+        intro: "What this page covers and how it relates to the other pages. Link siblings: <a href='index.html'>index</a>.",
+        /* Flow pages usually skip the foundations section — it lives on index.html. */
+        foundations: false,
+        defaultZoom: 70,
+        sections: [
+          {
+            id: "first-window",
+            title: "First window",
+            desc: "What this surface is for. One section per window type; one column per state.",
+            cols: [
+              {
+                label: "<b>State.</b> What this window shows and why.",
+                html: win(`<h2 class="t-title">First window</h2>`, { title: "Window", size: [800, 520], minSize: [640, 420] }),
+              },
+            ],
+            notes: [],
+          },
+        ],
+        pageNotes: [],
+      });
+    </script>
+  </body>
+</html>

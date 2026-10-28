@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fieldnote — desktop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="window.css" />
+    <!-- Icons: Phosphor regular, the same library as the mobile sibling, so
+         a symbol means the same thing on both. Production on macOS maps each
+         to its closest SF Symbol (table in DESIGN-SYSTEM.md). -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style>
+      /* =====================================================================
+         Layer 2: screen CSS for this page. Every color, size, radius, and
+         space comes from design-system values.
+         ===================================================================== */
+
+      /* Window surfaces: the sidebar sits on the paper canvas, the list on
+         the quieter functional surface, the entry itself on the card — the
+         note being read is always the brightest thing in the window. */
+      .wscreen {
+        --win-sidebar: var(--canvas);
+      }
+      .fn-win .wscreen {
+        --win-bg: var(--card);
+      }
+
+      .stack > * + * {
+        margin-top: var(--space-3);
+      }
+      .spaced {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-3);
+      }
+      .muted {
+        color: var(--ink-400);
+      }
+
+      /* ---- quick-note popover ---- */
+      .qn-field {
+        background: var(--card);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-control);
+        padding: var(--space-3);
+        min-height: 92px;
+      }
+      .qn-field.focus {
+        border-color: var(--accent-interactive);
+        box-shadow: 0 0 0 3px var(--accent-tint);
+      }
+      .qn-field .placeholder {
+        color: var(--ink-400);
+      }
+      .caret {
+        display: inline-block;
+        width: 1.5px;
+        height: 16px;
+        background: var(--accent-interactive);
+        vertical-align: -3px;
+        margin-left: 1px;
+      }
+      .qn-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-4);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-pill);
+        padding: 2px var(--space-2);
+        background: var(--functional);
+      }
+      .chip.sel {
+        background: var(--selected);
+        border-color: var(--ink-600);
+      }
+      .chip.add {
+        border-style: dashed;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+      .saved-mark {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-tint);
+        color: var(--accent-interactive);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .qn-quote {
+        border-left: 2px solid var(--accent-decorative);
+        padding-left: var(--space-3);
+      }
+      .kbd-hint {
+        color: var(--ink-400);
+      }
+
+      /* ---- main window: list + detail ---- */
+      .fn-split {
+        display: flex;
+        height: 100%;
+      }
+      .fn-list {
+        width: 290px;
+        flex: 0 0 auto;
+        background: var(--functional);
+        border-right: 1px solid var(--border-subtle);
+        padding: var(--space-2);
+        overflow: hidden;
+      }
+      .fn-list-h {
+        padding: var(--space-2) var(--space-3) var(--space-1);
+      }
+      .fn-row {
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-small);
+        position: relative;
+      }
+      .fn-row + .fn-row {
+        margin-top: 2px;
+      }
+      .fn-row.sel {
+        background: var(--selected);
+      }
+      .fn-row.hover {
+        background: var(--accent-tint);
+      }
+      .fn-row .t-callout {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-top: 2px;
+      }
+      .fn-detail {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-8) var(--space-10);
+      }
+      .fn-detail .t-body-lg {
+        max-width: 520px;
+      }
+      .fn-meta {
+        display: flex;
+        gap: var(--space-4);
+        align-items: center;
+        margin-top: var(--space-6);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border-subtle);
+        max-width: 520px;
+      }
+      mark {
+        background: var(--accent-tint);
+        color: var(--ink-900);
+        border-radius: 2px;
+      }
+
+      /* week look-back: one reading column, no list */
+      .lb {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: var(--space-8) 0;
+      }
+      .lb-tags {
+        margin-top: var(--space-3);
+      }
+      .lb-day {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: var(--space-4);
+        padding: var(--space-4) 0;
+        border-top: 1px solid var(--border-subtle);
+      }
+      .lb-day:first-of-type {
+        margin-top: var(--space-6);
+      }
+      .lb-day .t-caption {
+        padding-top: 5px;
+      }
+
+      /* centered states: first run, empty search, locked */
+      .center-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: var(--space-10);
+      }
+      .center-state > * + * {
+        margin-top: var(--space-3);
+      }
+      .center-state .t-body {
+        max-width: 360px;
+      }
+      .state-art {
+        width: 72px;
+        height: 72px;
+        border-radius: var(--radius-card);
+        background: var(--accent-tint);
+        color: var(--accent-interactive);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 34px;
+        margin-bottom: var(--space-2);
+      }
+
+      /* ---- delete sheet ---- */
+      .del-quote {
+        margin-top: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        background: var(--functional);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-control);
+      }
+
+      /* App icon tile used by alerts and the Windows title bar. */
+      .fn-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 13px;
+        background: var(--accent-tint);
+        color: var(--accent-interactive);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: inset 0 0 0 1px var(--border-subtle);
+      }
+      .fn-icon.sm {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      /* ---- settings forms ---- */
+      .form {
+        background: var(--card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-control);
+      }
+      .form + .form,
+      .form + .form-note,
+      .form-note + .form {
+        margin-top: var(--space-4);
+      }
+      .form-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        min-height: 40px;
+        padding: var(--space-2) var(--space-3);
+      }
+      .form-row + .form-row {
+        border-top: 1px solid var(--border-subtle);
+      }
+      .form-row .t-callout {
+        margin-top: 2px;
+        max-width: 340px;
+      }
+      .form-stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        align-items: flex-start;
+      }
+      .form-note {
+        padding: 0 var(--space-3);
+      }
+      .form-end {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: var(--space-5);
+      }
+      .shortcut-field {
+        font-family: var(--font-body);
+        letter-spacing: 0.08em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script src="mockup-core.js"></script>
+    <script src="window.js"></script>
+    <script>
+      /* ===================================================================
+         Fieldnote — desktop. A fictional private journal: one honest
+         sentence a day, tags, a quiet weekly look-back, no streaks.
+         Mobile sibling: ../mobile/ (color roles shared verbatim).
+         =================================================================== */
+
+      const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
+      const APP_ICON = `<span class="fn-icon">${icon("notebook")}</span>`;
+      const APP_ICON_SM = `<span class="fn-icon sm">${icon("notebook")}</span>`;
+      const GLYPH = icon("notebook");
+
+      /* ---- data: one plausible journal, used everywhere on this page ----
+         Counts in the sidebar, look-back, search, and export all derive from
+         these entries plus the 30 older notes summarized below — so the
+         numbers on every screen agree. */
+      const THIS_WEEK = [
+        { day: "Wednesday", date: "Wednesday, October 28", text: "Fixed the bike chain myself. Took an hour, felt like ten minutes.", tags: ["Made something"], time: "9:12 PM" },
+        { day: "Tuesday", date: "Tuesday, October 27", text: "Long walk before work; the park smelled like rain.", tags: ["Walked"], time: "7:48 AM" },
+        { day: "Monday", date: "Monday, October 26", text: "Deadline day. Kept it together with two short breaks and an early night.", tags: ["Work"], time: "10:31 PM" },
+      ];
+      const LAST_WEEK = [
+        { day: "Sunday", text: "Slow morning, pancakes, called Dad.", tags: ["Family", "Cooked"] },
+        { day: "Saturday", text: "Walked the long loop to the reservoir with Mira.", tags: ["Walked", "Friends"] },
+        { day: "Thursday", text: "Couldn't sleep, read until two. Not a great day, and that's fine.", tags: ["Rough day", "Read"] },
+        { day: "Wednesday", text: "Made soup from whatever was left in the fridge. Better than planned.", tags: ["Cooked"] },
+        { day: "Monday", text: "First cold morning. Walked anyway.", tags: ["Walked"] },
+      ];
+      /* 3 + 5 + 4 + 6 + 24 = 42 notes in all. */
+
+      const sidebar = (active) =>
+        sideNav(
+          [
+            { header: "Journal" },
+            { key: "week", icon: icon("sun"), label: "This week", badge: 3 },
+            { key: "all", icon: icon("notebook"), label: "All notes", badge: 42 },
+            { header: "Look back" },
+            { key: "w43", icon: icon("calendar-blank"), label: "Oct 19 – 25", badge: 5 },
+            { key: "w42", icon: icon("calendar-blank"), label: "Oct 12 – 18", badge: 4 },
+            { key: "w41", icon: icon("calendar-blank"), label: "Oct 5 – 11", badge: 6 },
+            { key: "sep", icon: icon("calendar-blank"), label: "September", badge: 24 },
+            { header: "Tags" },
+            { key: "walked", icon: icon("tag"), label: "Walked", badge: 11 },
+            { key: "cooked", icon: icon("tag"), label: "Cooked", badge: 6 },
+            { key: "read", icon: icon("tag"), label: "Read", badge: 5 },
+            { key: "rough", icon: icon("tag"), label: "Rough day", badge: 3 },
+          ],
+          active,
+        );
+      const emptySidebar = sideNav(
+        [
+          { header: "Journal" },
+          { key: "week", icon: icon("sun"), label: "This week" },
+          { key: "all", icon: icon("notebook"), label: "All notes" },
+        ],
+        "week",
+      );
+
+      const chips = (tags) => tags.map((t) => `<span class="chip t-caption">${t}</span>`).join("");
+
+      const row = (day, text, { sel = false, hover = false } = {}) =>
+        `<div class="fn-row${sel ? " sel" : ""}${hover ? " hover" : ""}"><div class="spaced"><span class="t-subheading">${day}</span></div><div class="t-callout">${text}</div></div>`;
+
+      const weekList = (selIdx, opts = {}) =>
+        `<div class="fn-list">
+          <div class="fn-list-h t-caption">Oct 26 – Nov 1</div>
+          ${THIS_WEEK.map((e, i) => row(e.day, e.text, { sel: i === selIdx, hover: opts.hover === i })).join("")}
+        </div>`;
+
+      const detail = (e) =>
+        `<div class="fn-detail">
+          <div class="t-caption">${e.date}</div>
+          <p class="t-body-lg" style="margin-top: var(--space-3)">${e.text}</p>
+          <div class="chip-row" style="margin-top: var(--space-4)">${chips(e.tags)}<span class="chip add t-caption">${icon("plus")} Tag</span></div>
+          <div class="fn-meta"><span class="t-caption muted">Written at ${e.time}</span></div>
+        </div>`;
+
+      const TOOLBAR = ctl.search("Search notes", { width: 220 }) + ctl.tool(icon("note-pencil"));
+
+      /* The main window, macOS. Every journal state shares this frame. */
+      const journal = (inner, o = {}) =>
+        `<div class="fn-win">${win(inner, {
+          title: "This week",
+          subtitle: "Oct 26 – Nov 1 · 3 notes",
+          size: [1080, 700],
+          minSize: [820, 520],
+          sidebar: sidebar("week"),
+          toolbar: TOOLBAR,
+          pad: false,
+          ...o,
+        })}</div>`;
+      const readingWed = `<div class="fn-split">${weekList(0)}${detail(THIS_WEEK[0])}</div>`;
+
+      /* ================= quick-note popover ================= */
+      const qnHeader = `<div class="spaced"><span class="t-subheading">Wednesday</span><span class="t-caption">October 28</span></div>`;
+      const qnTags = (sel) =>
+        `<div class="chip-row">${["Walked", "Cooked", "Made something"]
+          .map((t) => `<span class="chip t-caption${sel.includes(t) ? " sel" : ""}">${t}</span>`)
+          .join("")}<span class="chip add t-caption">${icon("plus")}</span></div>`;
+
+      const qnEmpty = panel(
+        `<div class="stack">
+          ${qnHeader}
+          <div class="qn-field focus"><span class="caret"></span><span class="t-body placeholder">What stood out today?</span></div>
+          ${qnTags([])}
+        </div>
+        <div class="qn-foot">
+          <span class="t-caption kbd-hint">Esc to close</span>
+          ${ctl.button("Save", { state: "disabled" })}
+        </div>`,
+        { width: 340, glyph: GLYPH },
+      );
+
+      const qnTyping = panel(
+        `<div class="stack">
+          ${qnHeader}
+          <div class="qn-field focus"><span class="t-body">Fixed the bike chain myself. Took an hour, felt like ten minutes.<span class="caret"></span></span></div>
+          ${qnTags(["Made something"])}
+        </div>
+        <div class="qn-foot">
+          <span class="t-caption kbd-hint">${keys("enter")} to save · Esc to close</span>
+          ${ctl.button("Save", { kind: "default" })}
+        </div>`,
+        { width: 340, glyph: GLYPH },
+      );
+
+      const qnSaved = panel(
+        `<div class="stack">
+          <div class="saved-mark">${icon("check")}</div>
+          <div class="t-heading">Saved to Wednesday.</div>
+          <p class="t-body-lg qn-quote">Fixed the bike chain myself. Took an hour, felt like ten minutes.</p>
+          <div class="t-caption muted">This closes on its own in a moment.</div>
+        </div>
+        <div class="qn-foot">
+          <span class="t-link">Open Fieldnote</span>
+          <span class="t-caption kbd-hint">${keys("mod+O")}</span>
+        </div>`,
+        { width: 340, glyph: GLYPH },
+      );
+
+      const qnAlready = panel(
+        `<div class="stack">
+          ${qnHeader}
+          <p class="t-body-lg">Fixed the bike chain myself. Took an hour, felt like ten minutes.</p>
+          <div class="chip-row">${chips(["Made something"])}</div>
+        </div>
+        <div class="qn-foot">
+          <span class="t-link">Add a line to today</span>
+          ${ctl.button("Done")}
+        </div>`,
+        { width: 340, glyph: GLYPH },
+      );
+
+      /* ================= main window states ================= */
+      const lookBack = journal(
+        `<div class="lb">
+          <div class="t-caption">Look back · October 19 – 25</div>
+          <h2 class="t-display" style="margin-top: var(--space-2)">Five notes.</h2>
+          <div class="chip-row lb-tags">${chips(["Walked 2", "Cooked 2", "Family 1", "Friends 1", "Read 1", "Rough day 1"])}</div>
+          ${LAST_WEEK.map((e) => `<div class="lb-day"><span class="t-caption">${e.day}</span><p class="t-body-lg">${e.text}</p></div>`).join("")}
+          <div class="lb-day"><span></span><span class="t-link">Add a note to this week</span></div>
+        </div>`,
+        { title: "Oct 19 – 25", subtitle: "Look back · 5 notes", sidebar: sidebar("w43") },
+      );
+
+      const firstRun = journal(
+        `<div class="center-state">
+          <div class="state-art">${icon("notebook")}</div>
+          <h2 class="t-title">Your first note</h2>
+          <p class="t-body">One honest sentence about today is enough. There are no streaks here, and no blank days to make up for.</p>
+          <div style="margin-top: var(--space-5)">${ctl.button("Write today's note", { kind: "default" })}</div>
+          <p class="t-caption muted">Or press ${keys("mod+alt+N")} from any app — the menu-bar note is always one shortcut away.</p>
+        </div>`,
+        { title: "This week", subtitle: "Oct 26 – Nov 1", sidebar: emptySidebar },
+      );
+
+      /* ================= menus and shortcuts ================= */
+      const fileMenu = menubar(["Fieldnote", "File", "Edit", "View", "Window", "Help"], {
+        open: "File",
+        width: 640,
+        height: 300,
+        menuWidth: 250,
+        items: [
+          { label: "New Note", keys: "mod+N" },
+          { label: "Quick Note from Menu Bar", keys: "mod+alt+N", hi: true },
+          "-",
+          { label: "Go to Today", keys: "mod+T" },
+          { label: "Look Back at Last Week", keys: "mod+shift+L" },
+          "-",
+          { label: "Export…", keys: "mod+shift+E" },
+          "-",
+          { label: "Close Window", keys: "mod+W" },
+        ],
+      });
+
+      const contextMenu = journal(`<div class="fn-split">${weekList(0, { hover: 1 })}${detail(THIS_WEEK[0])}</div>`, {
+        overlay:
+          menu(
+            [
+              { label: "Open Note", keys: "enter" },
+              { label: "Edit Note", keys: "mod+E" },
+              { label: "Copy Text", keys: "mod+C" },
+              { label: "Add Tag…", keys: "mod+shift+T" },
+              "-",
+              { label: "Delete Note…", keys: "mod+delete", danger: true, hi: true },
+            ],
+            { width: 230, style: "position:absolute;left:390px;top:220px" },
+          ) +
+          pointer(392, 352),
+      });
+
+      const toolbarTip = journal(readingWed, {
+        overlay:
+          tooltip("New note", { keys: "mod+N", style: "position:absolute;right:16px;top:58px" }) +
+          pointer(1052, 30),
+        toolbar: ctl.search("Search notes", { width: 220 }) + ctl.tool(icon("note-pencil"), { state: "hover" }),
+      });
+
+      /* ================= search ================= */
+      const RESULTS = [
+        ["Tuesday, Oct 27", "Long <mark>walk</mark> before work; the park smelled like rain."],
+        ["Saturday, Oct 24", "<mark>Walk</mark>ed the long loop to the reservoir with Mira."],
+        ["Monday, Oct 19", "First cold morning. <mark>Walk</mark>ed anyway."],
+        ["Thursday, Oct 15", "<mark>Walk</mark>ed to the bakery before it opened. Worth it."],
+        ["Friday, Oct 9", "Rain all day; short <mark>walk</mark> at lunch anyway."],
+        ["Sunday, Sep 27", "<mark>Walk</mark>ed home the long way and called nobody. Good."],
+        ["Monday, Sep 14", "First <mark>walk</mark> without a jacket in a while."],
+      ];
+      const searchTb = (q) => ctl.search("Search notes", { value: q, focused: true, width: 220 }) + ctl.tool(icon("note-pencil"));
+
+      const searchResults = journal(
+        `<div class="fn-split">
+          <div class="fn-list">
+            <div class="fn-list-h t-caption">7 notes</div>
+            ${RESULTS.map(([d, t], i) => row(d, t, { sel: i === 0 })).join("")}
+          </div>
+          <div class="fn-detail">
+            <div class="t-caption">Tuesday, October 27</div>
+            <p class="t-body-lg" style="margin-top: var(--space-3)">Long <mark>walk</mark> before work; the park smelled like rain.</p>
+            <div class="chip-row" style="margin-top: var(--space-4)">${chips(["Walked"])}</div>
+          </div>
+        </div>`,
+        { title: "Search", subtitle: "7 notes mention “walk”", sidebar: sidebar(""), toolbar: searchTb("walk") },
+      );
+
+      const searchEmpty = journal(
+        `<div class="center-state">
+          <div class="state-art">${icon("magnifying-glass")}</div>
+          <h2 class="t-title">Nothing about “marathon” yet.</h2>
+          <p class="t-body">Search looks through every note and tag. Try a shorter word, or one of your tags.</p>
+          <div class="chip-row" style="justify-content: center; margin-top: var(--space-4)">${chips(["Walked", "Cooked", "Read"])}</div>
+        </div>`,
+        { title: "Search", subtitle: "No notes match", sidebar: sidebar(""), toolbar: searchTb("marathon") },
+      );
+
+      /* ================= delete ================= */
+      const deleteSheet = `<div class="fn-win">${sheet(
+        `<div class="t-heading">Delete this note?</div>
+         <div class="del-quote"><div class="t-caption">Wednesday, October 28</div><p class="t-body-lg" style="margin-top: var(--space-1)">Fixed the bike chain myself. Took an hour, felt like ten minutes.</p></div>
+         <p class="t-callout" style="margin-top: var(--space-3)">It moves to Recently Deleted for 30 days, then it's gone from this Mac and your other devices.</p>`,
+        {
+          width: 420,
+          actions: [
+            { label: "Delete Note", kind: "danger" },
+            { label: "Cancel", kind: "default" },
+          ],
+          over: { inner: readingWed, title: "This week", subtitle: "Oct 26 – Nov 1 · 3 notes", size: [1080, 700], sidebar: sidebar("week"), toolbar: TOOLBAR, pad: false },
+        },
+      )}</div>`;
+
+      const emptyTrash = `<div class="fn-win">${alert(
+        {
+          icon: APP_ICON,
+          title: "Empty Recently Deleted?",
+          body: "2 notes will be erased from this Mac and your other devices. This can't be undone.",
+          buttons: [
+            { label: "Cancel", kind: "cancel" },
+            { label: "Erase 2 Notes", kind: "danger" },
+          ],
+        },
+        {
+          over: {
+            inner: `<div class="fn-split"><div class="fn-list"><div class="fn-list-h t-caption">Deleted notes stay here for 30 days</div>${row("Friday, Oct 23", "Too tired to write. Writing this instead.")}${row("Tuesday, Oct 20", "Test note, please ignore.")}</div><div class="fn-detail"></div></div>`,
+            title: "Recently Deleted",
+            subtitle: "2 notes",
+            size: [1080, 700],
+            sidebar: sidebar(""),
+            toolbar: ctl.tool(icon("trash"), { label: "Empty" }),
+            pad: false,
+          },
+        },
+      )}</div>`;
+
+      /* ================= settings ================= */
+      const PANES = [
+        { key: "general", icon: icon("gear-six"), label: "General" },
+        { key: "privacy", icon: icon("lock-simple"), label: "Privacy" },
+        { key: "export", icon: icon("export"), label: "Export" },
+      ];
+      const formRow = (label, control, caption = "") =>
+        `<div class="form-row"><div><div class="t-body">${label}</div>${caption ? `<div class="t-callout">${caption}</div>` : ""}</div>${control}</div>`;
+
+      const settingsGeneral = settingsWin(
+        `<div class="form">
+          ${formRow("Quick note shortcut", `<span class="shortcut-field">${ctl.field(keys("mod+alt+N"), { width: 110 })}</span>`, "Opens the menu-bar note from any app.")}
+          ${formRow("Show Fieldnote in the menu bar", ctl.toggle(true))}
+          ${formRow("Open at login", ctl.toggle(true))}
+        </div>
+        <div class="form">
+          ${formRow("Week starts on", ctl.popup("Monday", { width: 130 }))}
+          ${formRow("Weekly look-back", ctl.popup("Sunday evening", { width: 150 }), "Waiting when you next open Fieldnote. Never a notification.")}
+          ${formRow("Daily reminder", ctl.toggle(false), "Off by default. If you turn it on, it asks once and doesn't repeat.")}
+        </div>`,
+        { tabs: PANES, active: "general", size: [580, null] },
+      );
+
+      const settingsPrivacy = settingsWin(
+        `<div class="form">
+          ${formRow("Lock Fieldnote", ctl.toggle(true), "Notes stay hidden until you unlock.")}
+          ${formRow("Require unlock", ctl.popup("After 5 minutes away", { width: 190 }))}
+          ${formRow("Unlock with Touch ID", ctl.check(true))}
+          ${formRow("Hide today's note in the menu bar while locked", ctl.check(true))}
+        </div>
+        <div class="form">
+          ${formRow("Fieldnote password", ctl.button("Change Password…"))}
+        </div>
+        <p class="t-callout form-note" style="margin-top: var(--space-4)">Notes are stored on this Mac and end-to-end encrypted when they sync. Fieldnote has no account and no analytics.</p>`,
+        { tabs: PANES, active: "privacy", size: [580, null] },
+      );
+
+      const settingsExport = settingsWin(
+        `<div class="form">
+          <div class="form-row"><div class="t-body">Format</div>
+            <div class="form-stack">${ctl.radio(false, "Plain text, one file per week")}${ctl.radio(true, "Markdown, one file per week")}${ctl.radio(false, "JSON, one file")}</div>
+          </div>
+          ${formRow("Include tags", ctl.check(true))}
+          ${formRow("Include look-backs", ctl.check(false))}
+          ${formRow("Save to", ctl.popup("Documents › Fieldnote", { width: 210 }))}
+        </div>
+        <p class="t-callout form-note" style="margin-top: var(--space-4)">Exports are copies. Nothing is removed from Fieldnote.</p>
+        <div class="form-end">${ctl.button("Export 42 Notes…", { kind: "default" })}</div>`,
+        { tabs: PANES, active: "export", size: [580, null] },
+      );
+
+      const locked = journal(
+        `<div class="center-state">
+          <div class="state-art">${icon("lock-simple")}</div>
+          <h2 class="t-title">Fieldnote is locked</h2>
+          <p class="t-body">Use Touch ID or your Fieldnote password to read your notes.</p>
+          <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4)">${ctl.field("", { placeholder: "Password", width: 200, focused: true })}${ctl.button("Unlock", { kind: "default" })}</div>
+        </div>`,
+        { title: "Fieldnote", subtitle: "", sidebar: "", toolbar: "", size: [1080, 700] },
+      );
+
+      /* ================= Windows 11 variant ================= */
+      const winSidebar = (active) =>
+        sideNav(
+          [
+            { key: "week", icon: icon("sun"), label: "This week", badge: 3 },
+            { key: "all", icon: icon("notebook"), label: "All notes", badge: 42 },
+            { header: "Look back" },
+            { key: "w43", icon: icon("calendar-blank"), label: "Oct 19 – 25", badge: 5 },
+            { key: "w42", icon: icon("calendar-blank"), label: "Oct 12 – 18", badge: 4 },
+            { key: "w41", icon: icon("calendar-blank"), label: "Oct 5 – 11", badge: 6 },
+            { header: "Tags" },
+            { key: "walked", icon: icon("tag"), label: "Walked", badge: 11 },
+            { key: "cooked", icon: icon("tag"), label: "Cooked", badge: 6 },
+          ],
+          active,
+        );
+      const winOpts = {
+        platform: "windows",
+        title: "Fieldnote",
+        icon: APP_ICON_SM,
+        size: [1080, 700],
+        minSize: [820, 520],
+        sidebar: winSidebar("week"),
+        sidebarWidth: 260,
+        toolbar: ctl.tool(icon("note-pencil"), { label: "New note" }) + `<span style="flex:1"></span>` + ctl.search("Search notes", { width: 280 }),
+        pad: false,
+      };
+      const windowsMain = `<div class="fn-win">${win(readingWed, winOpts)}</div>`;
+      const windowsDelete = `<div class="fn-win">${sheet(
+        `<p class="w-dlg-text">“Fixed the bike chain myself.” from Wednesday, October 28 moves to Recently Deleted for 30 days, then it's gone from this PC and your other devices.</p>`,
+        {
+          platform: "windows",
+          title: "Delete this note?",
+          actions: [
+            { label: "Delete note", kind: "danger" },
+            { label: "Cancel", kind: "cancel" },
+          ],
+          over: { inner: readingWed, ...winOpts },
+        },
+      )}</div>`;
+      const windowsTray = panel(
+        `<div class="stack">
+          ${qnHeader}
+          <div class="qn-field focus"><span class="t-body">Fixed the bike chain myself. Took an hour, felt like ten minutes.<span class="caret"></span></span></div>
+          ${qnTags(["Made something"])}
+        </div>
+        <div class="qn-foot">
+          <span class="t-caption kbd-hint">Enter to save · Esc to close</span>
+          ${ctl.button("Save", { kind: "default" })}
+        </div>`,
+        { platform: "windows", width: 360, glyph: GLYPH },
+      );
+
+      renderMockupPage({
+        title: "Fieldnote — desktop",
+        intro:
+          "Desktop surfaces for Fieldnote, a private journal: one honest sentence a day, tags, a quiet weekly look-back, no streaks. macOS first, with a Windows 11 variant at the end. Color roles are shared verbatim with the <a href='../mobile/'>mobile mockups</a>; type is re-derived for desktop.",
+        defaultZoom: 70,
+        contrastPairs: [
+          ["--ink-900", "--canvas"],
+          ["--ink-900", "--card"],
+          ["--ink-900", "--functional"],
+          ["--ink-900", "--selected"],
+          ["--ink-900", "--accent-tint"],
+          ["--ink-600", "--canvas"],
+          ["--ink-600", "--card"],
+          ["--ink-600", "--functional"],
+          ["--ink-600", "--selected"],
+          ["--ink-400", "--canvas"],
+          ["--ink-400", "--card"],
+          ["--ink-400", "--functional"],
+          ["--accent-interactive", "--canvas"],
+          ["--accent-interactive", "--card"],
+          ["--accent-interactive", "--accent-tint"],
+          ["--danger", "--card"],
+          ["--danger", "--canvas"],
+          ["--btn-label", "--btn-fill"],
+          ["--btn-label", "--accent-interactive"],
+        ],
+        sections: [
+          {
+            id: "quick-note",
+            title: "Menu-bar quick note",
+            desc: "The daily habit lives in the menu bar: one shortcut, one sentence, gone again. The popover is as tall as its content and never grows a toolbar.",
+            cols: [
+              { label: "<b>Empty.</b> Opens with the cursor in the field. Save is disabled until there's a word to save.", html: qnEmpty },
+              { label: "<b>Typing.</b> Save becomes the default button: Return saves, Esc closes. Tags are optional and one click each.", html: qnTyping },
+              { label: "<b>Saved.</b> The sentence is read back once, in the reading face, then the popover closes itself.", html: qnSaved },
+              { label: "<b>Already written today.</b> Shows today's note instead of an empty field. Adding is offered; replacing never is.", tag: "Edge", html: qnAlready },
+            ],
+            notes: [
+              note("No counters in the popover", "No streak, no character count, no “3 days in a row”. The popover asks one question and stays out of the way; counting belongs nowhere in this product."),
+              note("Keyboard first", "The shortcut opens it, Return saves, Esc closes. Hints sit in the footer in caption ink so they read as help, not instructions."),
+              note("Width 340, height follows content", "Wide enough for a 12-word sentence on two lines. The panel never scrolls: if the text gets long, the field grows and so does the panel."),
+            ],
+          },
+          {
+            id: "journal",
+            title: "Main window",
+            desc: "Where notes are reread. Sidebar for time and tags, a list of the week, and the note itself on the brightest surface, set in the serif.",
+            cols: [
+              { label: "<b>Reading a note.</b> Today's note is selected on open. The entry text is the only serif on screen besides titles.", html: journal(readingWed) },
+              { label: "<b>Weekly look-back.</b> A finished week reads as one column: tag counts from the week, then every sentence. No grades, no trends.", html: lookBack },
+              { label: "<b>First run.</b> One action, plus the shortcut that makes the habit possible. No tour.", tag: "Empty state", html: firstRun },
+            ],
+            notes: [
+              note("Three surfaces, three jobs", "Sidebar on canvas, list on functional, note on card. The note being read is always the lightest thing in the window, in both themes."),
+              note("Sidebar width 220, fixed", "Week labels and tag names fit without truncating at 13 pt. The sidebar never collapses: its meaning (where in time am I) is constant."),
+              note("Minimum 820 × 520", "Keeps list and a 520 pt reading measure side by side. Smaller windows would need a different layout, so the window stops here."),
+            ],
+          },
+          {
+            id: "menus",
+            title: "Menus and shortcuts",
+            desc: "Every command lives in a menu with its shortcut shown; toolbar items repeat the shortcut in their tooltip. Context menus mirror the menu bar wording exactly.",
+            cols: [
+              { label: "<b>File menu.</b> The quick-note shortcut is discoverable here, not only in Settings.", html: fileMenu },
+              { label: "<b>Context menu on a list row.</b> Hover tints the row; Delete sits last, behind a separator, in danger ink.", html: contextMenu },
+              { label: "<b>Toolbar hover.</b> The tooltip names the action and its shortcut. Toolbar items never have labels-only-on-hover.", html: toolbarTip },
+            ],
+            notes: [note("One name per action", "“Delete Note…” in the context menu, “Delete Note” on the sheet button, ⌘⌫ everywhere. The ellipsis means a confirmation follows.")],
+          },
+          {
+            id: "search",
+            title: "Search",
+            desc: "Search lives in the toolbar and replaces the list in place. Matches are highlighted with the accent tint, never bold.",
+            cols: [
+              { label: "<b>Results.</b> The count is the window subtitle; newest first.", html: searchResults },
+              { label: "<b>No results.</b> Suggests tags the person actually uses instead of a dead end.", tag: "Empty state", html: searchEmpty },
+            ],
+            notes: [],
+          },
+          {
+            id: "delete",
+            title: "Deleting",
+            desc: "Deleting a note is recoverable for 30 days, so it gets a sheet that shows exactly what goes. Emptying Recently Deleted is not recoverable, so it gets an alert.",
+            cols: [
+              { label: "<b>Delete sheet.</b> Quotes the note being deleted. Cancel is the default; Delete is in danger ink, not a red fill.", html: deleteSheet },
+              { label: "<b>Empty Recently Deleted.</b> The irreversible one: an alert with the count in the button.", html: emptyTrash },
+            ],
+            notes: [note("Why not undo instead of a sheet", "A journal entry is a memory. A toast that disappears in five seconds is too easy to miss for something people can't rewrite later.")],
+          },
+          {
+            id: "settings",
+            title: "Settings",
+            desc: "Three panes, each one screen tall. The window title is the pane name; the window is as tall as the pane.",
+            cols: [
+              { label: "<b>General.</b> The shortcut leads because it is how the product is used.", html: settingsGeneral },
+              { label: "<b>Privacy.</b> Lock is on by default. The promise is written in plain words under the controls.", html: settingsPrivacy },
+              { label: "<b>Export.</b> The button says how many notes go out, from the same 42 the sidebar counts.", html: settingsExport },
+              { label: "<b>Locked.</b> What “Lock Fieldnote” looks like: no sidebar, no list, nothing to read until unlocked.", tag: "Privacy", html: locked },
+            ],
+            notes: [note("Settings window size", "580 pt wide, height follows the pane. Zoom is disabled: settings are not a document."),],
+          },
+          {
+            id: "windows",
+            title: "Windows 11 variant",
+            desc: "Same roles, same copy, Windows conventions: caption buttons right, a navigation pane on the Mica base, content on a raised layer, primary dialog button first.",
+            cols: [
+              { label: "<b>Main window.</b> Command bar under the title bar; search on the right. Body text 14 px in production (Segoe UI Variable).", tag: "Windows", html: windowsMain },
+              { label: "<b>Delete dialog.</b> A content dialog: buttons in the footer band, primary first, Cancel last.", tag: "Windows", html: windowsDelete },
+              { label: "<b>Tray flyout.</b> The quick note opens above the taskbar, anchored to its tray icon.", tag: "Windows", html: windowsTray },
+            ],
+            notes: [note("Shortcuts translate, copy doesn't", "Ctrl replaces ⌘ through keys(); “this Mac” becomes “this PC”. Everything else is the same sentence on both platforms.")],
+          },
+        ],
+        pageNotes: [
+          note("How to read this page", "Each section is one window type; each frame is a state. Frames are 1:1 in points at their declared size; the zoom only changes display size."),
+          note("Parity with the app", "The app's debug build renders any named state to PNG (fieldnote-debug://snapshot?state=journal.lookback). Screenshots go next to these sections at review; a state that exists in the app but not here gets a section before it ships."),
+        ],
+      });
+    </script>
+  </body>
+</html>
