@@ -1,0 +1,179 @@
+/*
+ * phone.css — the phone frame for the mockup workbench. Load after
+ * mockup-core.css. Raw colors are allowed here for the same reason as in the
+ * core: the device shell is workbench, not product.
+ */
+
+/* ---- phone shell: 390×844 baseline, authored 1:1 with production points ---- */
+.phone {
+  width: 390px;
+  height: 844px;
+  border-radius: 54px;
+  background: #000;
+  padding: 10px;
+  box-shadow:
+    0 30px 60px -20px rgba(40, 38, 32, 0.5),
+    0 0 0 2px rgba(0, 0, 0, 0.9);
+  position: relative;
+}
+.phone > .screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 44px;
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 122px;
+  height: 34px;
+  background: #000;
+  border-radius: 999px;
+  z-index: 40;
+}
+/* Android: punch-hole camera instead of the island. */
+.punch {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  background: #000;
+  border-radius: 999px;
+  z-index: 40;
+}
+/* System gesture handle, both platforms. Drawn in ink so it reads on any
+   canvas; floating tab bars sit above it, never on it. */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--ink-900);
+  opacity: 0.85;
+  z-index: 45;
+}
+.phone.android .home-indicator {
+  width: 108px;
+  height: 4px;
+}
+.statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 17px 30px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-900);
+  z-index: 20;
+  flex: 0 0 auto;
+}
+.statusbar.android {
+  padding: 16px 26px 6px;
+  font-weight: 500;
+}
+.statusbar .sb-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.statusbar .sb-right i {
+  font-size: 17px;
+  line-height: 1;
+}
+.statusbar .sb-right svg,
+.navback svg {
+  display: block;
+}
+
+/* Screen body: the scrollable content region between chrome. */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px var(--screen-inset) 0;
+  overflow: hidden;
+  position: relative;
+}
+.body.scrolly {
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+.body.scrolly::-webkit-scrollbar {
+  width: 0;
+}
+.footer {
+  padding: 14px var(--screen-inset) 28px;
+  flex: 0 0 auto;
+}
+
+/* Back affordance for pushed screens. */
+.navback {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--functional);
+  border: 1px solid var(--border-subtle);
+  color: var(--ink-900);
+  font-size: 18px;
+  margin-bottom: var(--space-3);
+  flex: 0 0 auto;
+}
+
+/* Generic tab bar: opaque floating pill. Opaque on purpose — translucency
+   ghosts scrolled content through the bar and hurts label contrast. */
+.tabbar {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 22px;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 9px 6px;
+  box-shadow: 0 12px 26px -14px rgba(20, 18, 14, 0.4);
+  z-index: 30;
+}
+.tabbar .ti {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  color: var(--ink-400);
+  min-width: 56px;
+  cursor: default;
+}
+.tabbar .ti i {
+  font-size: 22px;
+}
+.tabbar .ti svg {
+  width: 22px;
+  height: 22px;
+}
+.tabbar .ti.on {
+  color: var(--accent-interactive);
+  font-weight: var(--weight-semibold);
+}
+/* Leave room for the floating bar when a screen shows one. */
+.body.floatpad {
+  padding-bottom: 96px;
+}
+.footer.floatpad {
+  padding-bottom: 98px;
+}
+

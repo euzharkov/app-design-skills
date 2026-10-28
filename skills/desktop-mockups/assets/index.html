@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mockups</title>
+    <!-- Webfonts: add a <link> here when the design system chooses one, and
+         point --font-display / --font-body at it in design-system.css.
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=…&display=swap" rel="stylesheet" />
+    -->
+    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="window.css" />
+    <!-- Icon library: the PROJECT'S choice, asked during discovery — never
+         assumed. On macOS the honest default is SF Symbols (mocked via a
+         generated mask-image CSS file or inline SVG, see
+         references/platforms/macos.md); on Windows, Segoe Fluent Icons. The
+         starter example uses Phosphor only so it renders anywhere; swap this
+         tag and the page-local icon() shorthand below. -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style>
+      /* =====================================================================
+         Layer 2: screen CSS for THIS page. Composition and positioning live
+         here; every color, size, radius, and space comes from design-system
+         values. Classes below are presentation hooks for these mockups, not
+         a component API — production is free to structure things its own way.
+         ===================================================================== */
+
+      .stack > * + * {
+        margin-top: var(--space-3);
+      }
+      .spaced {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-3);
+      }
+
+      /* Quick-note popover */
+      .qn-field {
+        background: var(--functional);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-control);
+        padding: var(--space-3);
+        min-height: 88px;
+      }
+      .qn-field .placeholder {
+        color: var(--ink-400);
+      }
+      .qn-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-3);
+      }
+
+      /* Main window: list + detail split inside the content region */
+      .split {
+        display: flex;
+        height: 100%;
+      }
+      .list {
+        width: 300px;
+        flex: 0 0 auto;
+        border-right: 1px solid var(--border-subtle);
+        padding: var(--space-2);
+      }
+      .row {
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-small);
+      }
+      .row.sel {
+        background: var(--selected);
+      }
+      .row + .row {
+        margin-top: var(--space-1);
+      }
+      .detail {
+        flex: 1;
+        padding: var(--space-6) var(--space-8);
+        max-width: 620px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-pill);
+        padding: 2px var(--space-2);
+        background: var(--functional);
+      }
+      .chip-row {
+        display: flex;
+        gap: var(--space-2);
+        margin-top: var(--space-4);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script src="mockup-core.js"></script>
+    <script src="window.js"></script>
+    <script>
+      /* ===================================================================
+         The example below mocks "Fieldnote", a tiny journaling app, purely
+         to demonstrate the method. Replace the sections with your product's
+         windows and delete the example. Keep the foundations section and
+         the contrast pairs in sync with your design system.
+
+         WINDOW_PLATFORM = "windows" here would switch every frame below.
+         =================================================================== */
+
+      /* Page-local icon shorthand for the library this project chose. */
+      const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
+
+      const quickNote = (typed) =>
+        panel(
+          `<div class="stack">
+            <div class="spaced"><span class="t-subheading">Wednesday</span><span class="t-caption">October 28</span></div>
+            <div class="qn-field">${
+              typed
+                ? `<span class="t-body">Fixed the bike chain myself. Took an hour, felt like ten minutes.</span>`
+                : `<span class="t-body placeholder">One honest sentence about today…</span>`
+            }</div>
+          </div>
+          <div class="qn-foot">
+            <span class="t-caption">${typed ? "Saves to today" : "Nothing saved yet"}</span>
+            ${ctl.button("Save", { kind: typed ? "default" : "normal", state: typed ? "" : "disabled" })}
+          </div>`,
+          { width: 320, glyph: icon("notebook") },
+        );
+
+      const sidebar = sideNav(
+        [
+          { header: "Journal" },
+          { key: "week", icon: icon("calendar-blank"), label: "This week", badge: 3 },
+          { key: "all", icon: icon("notebook"), label: "All notes", badge: 42 },
+          { header: "Tags" },
+          { key: "walked", icon: icon("tag"), label: "Walked", badge: 11 },
+          { key: "cooked", icon: icon("tag"), label: "Cooked", badge: 6 },
+        ],
+        "week",
+      );
+
+      const mainWindow = win(
+        `<div class="split">
+          <div class="list">
+            <div class="row sel"><div class="t-subheading">Wednesday</div><div class="t-callout">Fixed the bike chain myself.</div></div>
+            <div class="row"><div class="t-subheading">Tuesday</div><div class="t-callout">Long walk before work.</div></div>
+            <div class="row"><div class="t-subheading">Monday</div><div class="t-callout">Deadline day. Kept it together.</div></div>
+          </div>
+          <div class="detail">
+            <div class="t-caption">Wednesday, October 28</div>
+            <h2 class="t-title" style="margin-top: var(--space-1)">Fixed the bike chain myself.</h2>
+            <p class="t-body-lg" style="margin-top: var(--space-3)">Took an hour, felt like ten minutes. Grease under every nail and weirdly proud of it.</p>
+            <div class="chip-row"><span class="chip t-caption">Made something</span></div>
+          </div>
+        </div>`,
+        {
+          title: "This week",
+          subtitle: "3 notes",
+          size: [1000, 620],
+          minSize: [760, 480],
+          sidebar,
+          toolbar: ctl.search("Search notes") + ctl.tool(icon("plus")),
+          pad: false,
+        },
+      );
+
+      renderMockupPage({
+        title: "Fieldnote — example desktop mockup",
+        intro:
+          "A starter canvas for the HTML mockup method, desktop edition. Foundations render live from design-system.css; the example shows a menu-bar popover and a main window. Replace the example with your product and keep foundations honest.",
+        defaultZoom: 70,
+        contrastPairs: [
+          ["--ink-900", "--canvas"],
+          ["--ink-900", "--card"],
+          ["--ink-900", "--selected"],
+          ["--ink-600", "--canvas"],
+          ["--ink-600", "--card"],
+          ["--ink-600", "--selected"],
+          ["--ink-400", "--canvas"],
+          ["--ink-400", "--card"],
+          ["--ink-400", "--functional"],
+          ["--accent-interactive", "--canvas"],
+          ["--accent-interactive", "--card"],
+          ["--danger", "--canvas"],
+          ["--danger", "--card"],
+          ["--btn-label", "--btn-fill"],
+          ["--btn-label", "--accent-interactive"],
+        ],
+        sections: [
+          {
+            id: "example",
+            title: "Quick note and main window — example, delete me",
+            desc: "One section per window type; one column per state. The popover is the daily habit, the window is where notes are reread.",
+            cols: [
+              { label: "<b>Popover, empty.</b> Opens from the menu bar with the field focused. Save stays disabled until there is text.", html: quickNote(false) },
+              { label: "<b>Popover, typing.</b> Save becomes the default button: Return saves, Esc closes.", html: quickNote(true) },
+              { label: "<b>Main window.</b> Sidebar groups by time and tag; list and detail share the content column.", html: mainWindow },
+            ],
+            notes: [
+              note("Why a popover, not a window", "Writing one sentence should not need a window to manage. The popover opens from anywhere and closes itself after saving."),
+              note("Min size is part of the design", "760 × 480 keeps the list and a readable detail column side by side. Below that the layout would need a different arrangement, so the window refuses to shrink further."),
+            ],
+          },
+        ],
+        pageNotes: [
+          note("How to read this page", "Each section is a window type; each frame is a state, labeled underneath. Frames are authored 1:1 in points at their declared size — the zoom only changes display size."),
+        ],
+      });
+    </script>
+  </body>
+</html>

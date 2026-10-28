@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fieldnote — mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="phone.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style>
+      /* Layer 2: screen CSS for this page. Every value comes from
+         design-system.css; classes are presentation hooks, not components. */
+      .stack > * + * {
+        margin-top: var(--space-3);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
+        padding: var(--space-4);
+      }
+      .card.flat {
+        background: var(--functional);
+      }
+      .card.tint {
+        background: var(--accent-tint);
+        border-color: transparent;
+      }
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        background: var(--btn-fill);
+        border-radius: var(--radius-control);
+        padding: var(--space-4);
+        width: 100%;
+      }
+      .btn.quiet {
+        background: var(--functional);
+        border: 1px solid var(--border-control);
+      }
+      .btn.quiet span {
+        color: var(--ink-900);
+      }
+      .btn.danger {
+        background: var(--danger);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-pill);
+        padding: var(--space-2) var(--space-3);
+        background: var(--functional);
+      }
+      .chip.sel {
+        background: var(--selected);
+        border-color: var(--ink-600);
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+      .spaced {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .entry {
+        display: flex;
+        gap: var(--space-3);
+        align-items: flex-start;
+      }
+      .entry .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-decorative);
+        margin-top: 8px;
+        flex: 0 0 auto;
+      }
+      .entry .dot.empty {
+        background: transparent;
+        border: 1.5px solid var(--border-control);
+      }
+      .entry + .entry {
+        border-top: 1px solid var(--border-subtle);
+        padding-top: var(--space-3);
+        margin-top: var(--space-3);
+      }
+      .small {
+        font-size: 15px;
+        line-height: 22px;
+      }
+      .muted {
+        color: var(--ink-400);
+      }
+      .field {
+        background: var(--functional);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-control);
+        padding: var(--space-4);
+        min-height: 150px;
+      }
+      .field.focus {
+        border-color: var(--accent-interactive);
+        box-shadow: 0 0 0 3px var(--accent-tint);
+      }
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 20px;
+        background: var(--accent-interactive);
+        vertical-align: -4px;
+        margin-left: 1px;
+      }
+      .art {
+        height: 170px;
+        border-radius: var(--radius-card);
+        background: var(--accent-tint);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-interactive);
+        font-size: 56px;
+      }
+      .week {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: var(--space-2);
+        text-align: center;
+      }
+      .week .d {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-1);
+      }
+      .week .mark {
+        width: 30px;
+        height: 30px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-decorative);
+        opacity: 0.85;
+      }
+      .week .mark.none {
+        background: transparent;
+        border: 1.5px dashed var(--border-control);
+      }
+      .banner {
+        display: flex;
+        gap: var(--space-3);
+        align-items: flex-start;
+        background: var(--functional);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-control);
+        padding: var(--space-3) var(--space-4);
+      }
+      .banner i {
+        font-size: 20px;
+        color: var(--ink-600);
+        margin-top: 2px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) 0;
+      }
+      .row + .row {
+        border-top: 1px solid var(--border-subtle);
+      }
+      .toggle {
+        width: 51px;
+        height: 31px;
+        border-radius: var(--radius-pill);
+        background: var(--selected);
+        position: relative;
+        flex: 0 0 auto;
+      }
+      .toggle::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 27px;
+        height: 27px;
+        border-radius: var(--radius-pill);
+        background: var(--card);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+      .toggle.on {
+        background: var(--accent-interactive);
+      }
+      .toggle.on::after {
+        left: 22px;
+      }
+      .lock {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: var(--space-3);
+        padding: 0 var(--space-8);
+      }
+      .lock i {
+        font-size: 44px;
+        color: var(--accent-interactive);
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        background: var(--functional);
+        border: 1px solid var(--border-control);
+        border-radius: var(--radius-pill);
+        padding: var(--space-3) var(--space-4);
+      }
+      .search i {
+        color: var(--ink-400);
+        font-size: 18px;
+      }
+      .sheet-dim {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 14, 12, 0.38);
+        z-index: 50;
+      }
+      .sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--card);
+        border-radius: var(--radius-card) var(--radius-card) 0 0;
+        padding: var(--space-3) var(--screen-inset) 40px;
+        z-index: 55;
+      }
+      .grabber {
+        width: 36px;
+        height: 5px;
+        border-radius: var(--radius-pill);
+        background: var(--border-control);
+        margin: 0 auto var(--space-4);
+      }
+      .appbar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+      }
+      /* Accessibility-size column: role metrics scaled together, never one
+         role alone, so the hierarchy survives. */
+      .ax .t-title {
+        font-size: 36px;
+        line-height: 43px;
+      }
+      .ax .t-body {
+        font-size: 24px;
+        line-height: 33px;
+      }
+      .ax .t-caption,
+      .ax .t-callout {
+        font-size: 19px;
+        line-height: 26px;
+      }
+      .ax .t-subheading {
+        font-size: 23px;
+        line-height: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script src="mockup-core.js"></script>
+    <script src="phone.js"></script>
+    <script>
+      const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
+
+      const TABS = [
+        { key: "today", icon: icon("sun"), iconActive: icon("sun", true), label: "Today" },
+        { key: "weeks", icon: icon("calendar-blank"), iconActive: icon("calendar-blank", true), label: "Weeks" },
+        { key: "you", icon: icon("user-circle"), iconActive: icon("user-circle", true), label: "You" },
+      ];
+
+      const todayCard = `
+        <div class="card">
+          <div class="spaced"><span class="t-subheading">Today</span><span class="t-caption">7:52 pm</span></div>
+          <p class="t-body" style="margin-top: var(--space-2)">
+            Long walk before work. The park smelled like rain and the café finally had oat milk again.
+          </p>
+          <div class="chip-row" style="margin-top: var(--space-3)">
+            <span class="chip t-caption">Walked</span>
+            <span class="chip sel t-caption">Slept well</span>
+          </div>
+        </div>`;
+
+      const earlier = `
+        <div class="spaced" style="margin-top: var(--space-2)">
+          <span class="t-subheading">Earlier this week</span>
+          <span class="t-link small">All weeks</span>
+        </div>
+        <div class="card flat">
+          <div class="entry"><span class="dot"></span><div>
+            <div class="t-callout">Monday</div>
+            <p class="t-body small">Deadline day. Kept it together with two short breaks.</p>
+          </div></div>
+          <div class="entry"><span class="dot empty"></span><div>
+            <div class="t-callout">Sunday</div>
+            <p class="t-body small muted">No note — that's fine.</p>
+          </div></div>
+          <div class="entry"><span class="dot"></span><div>
+            <div class="t-callout">Saturday</div>
+            <p class="t-body small">Slow morning, pancakes, called Dad.</p>
+          </div></div>
+        </div>`;
+
+      const home = phone(
+        `<div class="stack">
+          <div class="spaced"><h2 class="t-title">Tuesday</h2><span class="t-caption">October 27</span></div>
+          ${todayCard}${earlier}
+        </div>`,
+        { tab: tabbar(TABS, "today") },
+      );
+
+      const firstRun = phone(
+        `<div class="stack" style="margin-top: var(--space-8)">
+          <div class="art">${icon("leaf")}</div>
+          <h2 class="t-title">Your first note</h2>
+          <p class="t-body">One honest sentence about today is enough. Nothing here counts, scores, or keeps a streak.</p>
+        </div>`,
+        { tab: tabbar(TABS, "today"), footer: `<div class="btn"><span class="t-on-accent">Write today's note</span></div>` },
+      );
+
+      const writing = phone(
+        `<div class="stack">
+          <h2 class="t-title">Tuesday's note</h2>
+          <div class="field focus">
+            <span class="t-body">Long walk before work. The park smelled like rain<span class="caret"></span></span>
+          </div>
+          <div class="t-caption">Tags, if you like</div>
+          <div class="chip-row">
+            <span class="chip sel t-caption">${icon("check")} Walked</span>
+            <span class="chip t-caption">Cooked</span>
+            <span class="chip t-caption">Read</span>
+            <span class="chip t-caption">Rough day</span>
+            <span class="chip t-caption">${icon("plus")} New tag</span>
+          </div>
+        </div>`,
+        { back: true, footer: `<div class="btn"><span class="t-on-accent">Save note</span></div>` },
+      );
+
+      const saved = phone(
+        `<div class="stack">
+          <div class="spaced"><h2 class="t-title">Tuesday</h2><span class="t-caption">October 27</span></div>
+          <div class="card tint">
+            <div class="spaced"><span class="t-subheading">Saved</span>${icon("check-circle", true)}</div>
+            <p class="t-callout" style="margin-top: var(--space-1)">See you tomorrow. You can edit today's note until midnight.</p>
+          </div>
+          ${todayCard}
+        </div>`,
+        { tab: tabbar(TABS, "today") },
+      );
+
+      const weekGrid = (marks) =>
+        `<div class="week">${["M", "T", "W", "T", "F", "S", "S"]
+          .map((d, i) => `<div class="d"><span class="t-caption">${d}</span><span class="mark ${marks[i] ? "" : "none"}"></span></div>`)
+          .join("")}</div>`;
+
+      const lookBack = phone(
+        `<div class="stack">
+          <h2 class="t-title">This week</h2>
+          <div class="card">${weekGrid([1, 1, 0, 1, 1, 0, 1])}</div>
+          <div class="card tint">
+            <div class="t-caption">What came up most</div>
+            <p class="t-body" style="margin-top: var(--space-1)">Walks showed up on four of five notes. Two of them mention sleeping well.</p>
+          </div>
+          <div class="t-subheading" style="margin-top: var(--space-2)">One line you wrote</div>
+          <div class="card flat">
+            <p class="t-body" style="font-family: var(--font-display)">“The park smelled like rain and the café finally had oat milk again.”</p>
+            <div class="t-caption" style="margin-top: var(--space-2)">Tuesday</div>
+          </div>
+        </div>`,
+        { tab: tabbar(TABS, "weeks") },
+      );
+
+      const quietWeek = phone(
+        `<div class="stack">
+          <h2 class="t-title">This week</h2>
+          <div class="card">${weekGrid([0, 1, 0, 0, 0, 0, 0])}</div>
+          <div class="card tint">
+            <p class="t-body">One note this week. Quiet weeks are part of the record too — there's nothing to catch up on.</p>
+          </div>
+        </div>`,
+        { tab: tabbar(TABS, "weeks") },
+      );
+
+      const locked = phone(
+        `<div class="lock">
+          ${icon("lock-simple")}
+          <h2 class="t-title">Fieldnote is locked</h2>
+          <p class="t-body">Your notes stay on this phone. Unlock with Face ID to read them.</p>
+        </div>`,
+        { scroll: false, footer: `<div class="btn"><span class="t-on-accent">Unlock</span></div><div class="btn quiet" style="margin-top: var(--space-2)"><span class="t-body">Use passcode</span></div>` },
+      );
+
+      const privacy = phone(
+        `<div class="stack">
+          <h2 class="t-title">Privacy</h2>
+          <div class="card">
+            <div class="row"><div><div class="t-subheading">Lock with Face ID</div><div class="t-caption">Asks every time you open Fieldnote</div></div><span class="toggle on"></span></div>
+            <div class="row"><div><div class="t-subheading">Hide in app switcher</div><div class="t-caption">Blurs your notes when you switch apps</div></div><span class="toggle on"></span></div>
+            <div class="row"><div><div class="t-subheading">iCloud sync</div><div class="t-caption">End-to-end encrypted; off by default</div></div><span class="toggle"></span></div>
+          </div>
+          <p class="t-caption">Fieldnote has no account and no analytics. Notes leave this phone only if you turn on sync or export them.</p>
+        </div>`,
+        { back: true },
+      );
+
+      const deleteSheet = phone(
+        `<div class="stack">${todayCard}</div>
+         <div class="sheet-dim"></div>
+         <div class="sheet">
+           <div class="grabber"></div>
+           <h3 class="t-heading">Delete Tuesday's note?</h3>
+           <p class="t-body" style="margin-top: var(--space-2)">It's removed from this phone and from sync. This can't be undone.</p>
+           <div class="btn danger" style="margin-top: var(--space-5)"><span class="t-on-accent">Delete note</span></div>
+           <div class="btn quiet" style="margin-top: var(--space-2)"><span class="t-body">Keep it</span></div>
+         </div>`,
+        { back: true, scroll: false },
+      );
+
+      const offline = phone(
+        `<div class="stack">
+          <div class="spaced"><h2 class="t-title">Tuesday</h2><span class="t-caption">October 27</span></div>
+          <div class="banner">${icon("cloud-slash")}<div><div class="t-subheading">Sync paused</div><div class="t-caption">Today's note is saved here and will sync when you're back online.</div></div></div>
+          ${todayCard}
+        </div>`,
+        { tab: tabbar(TABS, "today") },
+      );
+
+      const noResults = phone(
+        `<div class="stack">
+          <div class="search">${icon("magnifying-glass")}<span class="t-body">sourdough</span></div>
+          <div class="art" style="height: 140px; margin-top: var(--space-6)">${icon("magnifying-glass")}</div>
+          <h3 class="t-heading">No notes mention “sourdough”</h3>
+          <p class="t-body">Search looks through notes and tags. Try a shorter word, or a tag like “Cooked”.</p>
+        </div>`,
+        { tab: tabbar(TABS, "weeks") },
+      );
+
+      const longEntry = phone(
+        `<div class="stack">
+          <div class="spaced"><h2 class="t-title">Saturday</h2><span class="t-caption">October 24</span></div>
+          <div class="card">
+            <p class="t-body">Slow morning, pancakes, called Dad. He told the story about the boat again and I let him finish it this time, which felt like the point of the call. Afternoon was laundry and a long nap. Evening walk past the school — the maples are almost all red now. Made soup with whatever was left in the fridge and it was somehow the best thing I've cooked all month.</p>
+            <div class="chip-row" style="margin-top: var(--space-3)">
+              <span class="chip t-caption">Cooked</span><span class="chip t-caption">Family</span><span class="chip t-caption">Walked</span><span class="chip t-caption">Slept well</span><span class="chip t-caption">Slow day</span>
+            </div>
+          </div>
+        </div>`,
+        { back: true },
+      );
+
+      const axHome = `<div class="ax">${phone(
+        `<div class="stack">
+          <h2 class="t-title">Tuesday</h2>
+          <div class="card">
+            <div class="t-subheading">Today</div>
+            <p class="t-body" style="margin-top: var(--space-2)">Long walk before work. The park smelled like rain and the café finally had oat milk again.</p>
+            <div class="chip-row" style="margin-top: var(--space-3)"><span class="chip t-caption">Walked</span><span class="chip sel t-caption">Slept well</span></div>
+          </div>
+        </div>`,
+        { tab: tabbar(TABS, "today") },
+      )}</div>`;
+
+      const androidHome = phone(
+        `<div class="stack">
+          <div class="spaced"><h2 class="t-title">Tuesday</h2><span class="t-caption">October 27</span></div>
+          ${todayCard}${earlier}
+        </div>`,
+        { platform: "android", tab: tabbar(TABS, "today") },
+      );
+
+      const androidWriting = phone(
+        `<div class="stack">
+          <h2 class="t-title">Tuesday's note</h2>
+          <div class="field focus"><span class="t-body">Long walk before work<span class="caret"></span></span></div>
+        </div>`,
+        { platform: "android", back: true, footer: `<div class="btn"><span class="t-on-accent">Save note</span></div>` },
+      );
+
+      renderMockupPage({
+        title: "Fieldnote — mobile",
+        intro:
+          "Example product for the mobile-mockups skill: a private journal, one honest sentence a day. Sibling surfaces: <a href='../desktop/'>desktop</a> · <a href='../store/store.html'>store screenshots</a> · <a href='../icon/icon.html'>app icon</a>.",
+        contrastPairs: [
+          ["--ink-900", "--canvas"],
+          ["--ink-900", "--card"],
+          ["--ink-900", "--accent-tint"],
+          ["--ink-600", "--canvas"],
+          ["--ink-600", "--card"],
+          ["--ink-600", "--accent-tint"],
+          ["--ink-400", "--canvas"],
+          ["--ink-400", "--card"],
+          ["--accent-interactive", "--canvas"],
+          ["--accent-interactive", "--card"],
+          ["--danger", "--card"],
+          ["--btn-label", "--btn-fill"],
+          ["--btn-label", "--danger"],
+        ],
+        sections: [
+          {
+            id: "daily-loop",
+            title: "Daily loop",
+            desc: "Open, write one sentence, close. Everything else is optional and stays out of the way.",
+            cols: [
+              { label: "<b>Today.</b> Today's note first; the week sits quietly underneath. A missing day is a hollow dot, never a broken streak.", html: home },
+              { label: "<b>First run.</b> One action, no tour. The promise is in the copy: nothing counts or scores.", tag: "Empty", html: firstRun },
+              { label: "<b>Writing.</b> Free text leads; tags are optional and never block saving.", html: writing },
+              { label: "<b>Saved.</b> A calm confirmation with the edit window spelled out — no confetti.", html: saved },
+            ],
+            notes: [
+              note("Why no streaks", "Streaks turn a reflective habit into an obligation; a missed day then feels like failure. The week view shows presence, not performance."),
+              note("Footer CTA", "Screens with one obvious next step pin it in the footer so the scroll region never hides the main action."),
+            ],
+          },
+          {
+            id: "look-back",
+            title: "Weekly look-back",
+            desc: "Sunday evening, a short reflection on the week — what came up, and one line worth rereading.",
+            cols: [
+              { label: "<b>A full week.</b> Patterns in plain words; one quoted line in the display serif.", html: lookBack },
+              { label: "<b>A quiet week.</b> One note is still a week. No nudge, no guilt.", tag: "Edge", html: quietWeek },
+            ],
+            notes: [note("Plain-language patterns", "“Walks showed up on four of five notes” instead of a chart: the audience journals to notice, not to analyze.")],
+          },
+          {
+            id: "privacy",
+            title: "Privacy and deletion",
+            desc: "Notes are personal. The app says where they live and makes destructive actions deliberate.",
+            cols: [
+              { label: "<b>Locked.</b> States where notes live before asking for Face ID.", html: locked },
+              { label: "<b>Privacy settings.</b> Each toggle explains its consequence in one line.", html: privacy },
+              { label: "<b>Delete confirm.</b> Sheet over the note; consequence in the title, the safe choice equally easy.", tag: "Destructive", html: deleteSheet },
+            ],
+          },
+          {
+            id: "edges",
+            title: "Errors and edge content",
+            desc: "Offline, nothing found, and a note far longer than the happy path assumed.",
+            cols: [
+              { label: "<b>Offline.</b> Reassure first: the note is saved. Sync is secondary.", tag: "Error", html: offline },
+              { label: "<b>No results.</b> Say what was searched and suggest the next try.", tag: "Empty", html: noResults },
+              { label: "<b>Long note.</b> Five tags wrap; the card grows, nothing truncates.", tag: "Edge", html: longEntry },
+              { label: "<b>Largest text size.</b> Roles scale together; the hierarchy survives.", tag: "AX size", html: axHome },
+            ],
+          },
+          {
+            id: "android",
+            title: "Android differences",
+            desc: "The flow is shared; only the chrome changes. Android columns appear only where the platforms differ.",
+            cols: [
+              { label: "<b>Today, Android.</b> Punch-hole status bar, gesture handle; the tab bar keeps Fieldnote's own style on both platforms.", tag: "Android", tagAccent: true, html: androidHome },
+              { label: "<b>Writing, Android.</b> Back is an arrow and system back saves a draft — never discards.", tag: "Android", tagAccent: true, html: androidWriting },
+            ],
+            notes: [note("Back saves a draft", "System back is always available on Android. Losing a half-written note to a gesture would break the product's one promise, so back keeps a draft.")],
+          },
+        ],
+        pageNotes: [
+          note("How to read this page", "Each section is a flow; each phone is a state, labeled underneath. Toggle Light/Dark in the toolbar; append ?solo=<id> for one section."),
+        ],
+      });
+    </script>
+  </body>
+</html>

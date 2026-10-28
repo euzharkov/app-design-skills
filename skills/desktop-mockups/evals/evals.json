@@ -1,0 +1,23 @@
+{
+  "skill_name": "desktop-mockups",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a little Mac menu-bar app that shows how much battery each Bluetooth device has (working name 'Charge'). Before I touch SwiftUI, can you mock up the popover, a settings window, and what it looks like when no devices are connected? Light and dark please.",
+      "expected_output": "A mockup directory scaffolded from the skill assets with a customized design-system.css using a desktop type scale (13pt body), a filled DESIGN-SYSTEM.md with rules grouped per window (popover, settings), and an index.html whose sections are window types: a menu-bar popover via panel() with several states including the empty/no-devices state, and a settingsWin() with panes. Real copy and plausible device data, column labels and notes, shortcuts shown via keys(), contrast pairs updated, foundations audit green in both themes.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "We already have phone mockups for our habit-tracker in design/mobile-mockup (design-system.css, DESIGN-SYSTEM.md, index.html). Now we need the desktop app for macOS and Windows: main window with a sidebar, a delete-habit confirmation, and settings. Keep it feeling like the same product.",
+      "expected_output": "A new desktop mockup directory whose design-system.css copies the mobile color roles verbatim (both themes) and re-derives only type scale, spacing, radii, and insets for desktop; DESIGN-SYSTEM.md names the sibling system. Sections: main window via win() with sideNav sidebar, toolbar, and min size declared; delete confirmation as a sheet over its window with platform button order; settings window; plus a Windows variant using platform: 'windows' (caption buttons right, primary dialog button first, Ctrl shortcuts). No new hexes; mobile files untouched.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Our desktop mockups (design/mockup, built with this method) only show the happy path of the main window, and the shipped app keeps drifting from them. Can you fix the mockups so they actually cover the app and stay in sync?",
+      "expected_output": "Adds a section/column per missing UI state (empty, loading, error/offline, edge content, hover with pointer(), context menu with shortcuts, below-min-width layout if any) using only existing design-system values; replaces invented numbers with values from a real run where the product computes them; documents a debug snapshot hook (URL scheme or CLI flag rendering named states to PNG) and a side-by-side review step in DESIGN-SYSTEM.md's parity section; per-window rules updated; existing screens not restyled.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Store screenshots</title>
+    <!-- Same <head> as the mockup's other pages: fonts, icon library, and the
+         SAME design-system.css. Store frames never get their own palette. -->
+    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="phone.css" />
+    <!-- Desktop / Mac companion: uncomment when the mockup has window.css/js. -->
+    <!-- <link rel="stylesheet" href="window.css" /> -->
+    <link rel="stylesheet" href="store.css" />
+    <style>
+      /* ---- Layer-2 screen CSS ----
+         Copy the style rules your shots' screens need from the mockup page
+         that owns them (or link its shared screens.css). Values come from
+         design-system.css only. Store-only composition (a breakout card, a
+         per-frame glow position) also lives here. */
+      .demo-card {
+        background: var(--card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-card);
+        padding: var(--space-5);
+        margin-top: var(--space-4);
+      }
+      .demo-art {
+        position: absolute;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 150px;
+        height: 150px;
+        border-radius: var(--radius-card);
+        background: var(--accent-decorative);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="mockup-core.js"></script>
+    <script src="phone.js"></script>
+    <!-- <script src="window.js"></script> -->
+    <script src="store.js"></script>
+    <script>
+      /* ================= screens =================
+         Reuse the mockup's real screens: copy their template literals (and
+         page-local helpers) here verbatim, or load a shared screens.js.
+         Write each phone screen as a function of platform so the Play cut
+         swaps Android chrome automatically. Copy inside the device is the
+         product's real copy — never marketing paraphrase. */
+      const demoScreen = (platform) =>
+        phone(
+          `<h1 class="t-title">Replace with a real screen</h1>
+           <p class="t-body" style="margin-top: var(--space-2)">Paste the mockup screen this frame proves.</p>
+           <div class="demo-card"><div class="t-subheading">A card from the product</div><div class="t-callout">Real data, real copy.</div></div>
+           <div class="demo-card"><div class="t-subheading">Another state</div><div class="t-callout">The frame crops below the story.</div></div>`,
+          { platform },
+        );
+
+      /* ================= frames =================
+         Order is the story: promise → evidence → explanation. One idea per
+         frame; headline = the benefit, the device = the proof. */
+      renderStorePage({
+        title: "Store screenshots",
+        intro:
+          "Starter canvas. Replace the frames below with the product's story, then export with export.sh. Toggle Dark in the toolbar to review the dark set; the contrast audit at the bottom covers both.",
+        shots: [
+          {
+            id: "hero",
+            hero: true,
+            eyebrow: "Product name",
+            headline: "The promise, in a few words",
+            caption: "One sentence of support, if the headline needs it.",
+            device: demoScreen,
+            scale: 0.92,
+          },
+          {
+            id: "evidence",
+            eyebrow: "Feature area",
+            headline: "One benefit per frame",
+            device: demoScreen,
+          },
+          {
+            id: "night",
+            night: true,
+            eyebrow: "Dark mode",
+            headline: "A night beat mid-rail",
+            device: demoScreen,
+            android: { headline: "A night beat mid-rail" },
+          },
+        ],
+        subs: [{ id: "plus-monthly", word: "Plus", tag: "Monthly" }],
+        feature: {
+          mark: "Product name",
+          headline: "The promise, in a few words",
+          art: `<div class="demo-art"></div>`,
+        },
+        mac: [
+          /* Mac App Store frames: device = win(…) from window.js (or any
+             rendered desktop frame HTML). Leave empty for phone-only apps. */
+        ],
+      });
+    </script>
+  </body>
+</html>

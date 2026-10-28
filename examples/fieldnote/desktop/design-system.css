@@ -1,0 +1,210 @@
+/*
+ * design-system.css — Fieldnote desktop (example product).
+ *
+ * Fieldnote is a fictional private journal: one honest sentence a day, a
+ * quiet weekly look-back, no streaks. Tone words: calm, warm, unhurried.
+ *
+ * Sibling system: the COLOR ROLES below (both themes) are copied verbatim
+ * from ../mobile/design-system.css. Only the type scale, radii, and insets
+ * are re-derived for desktop (macOS body 13 pt, not mobile 17). If a color
+ * changes, it changes in the mobile file first and is copied here.
+ *
+ * Built with the desktop-mockups skill.
+ *
+ * Conventions the foundations page relies on:
+ *   - colors:   any custom property whose value is a color shows as a swatch
+ *   - fonts:    --font-NAME (families), --weight-NAME (the only loaded weights)
+ *   - spacing:  --space-N
+ *   - shape:    --radius-NAME
+ *   - type:     .t-ROLE classes render in the type ramp
+ */
+
+:root {
+  /* ---- Light semantic palette ----
+     Roles, not appearances. "canvas" is the app background, "card" a raised
+     surface, "functional" a quieter surface for controls/forms, "selected"
+     a pressed/chosen state fill, "accent-tint" a soft wash for highlighted
+     containers. Canvas and card must remain visibly distinct. */
+  --canvas: #f5f1ea;
+  --card: #fffdf9;
+  --functional: #faf7f1;
+  --selected: #e6e9df;
+  --accent-tint: #e8f0ea;
+
+  /* Ink scale: primary text, secondary text, tertiary/metadata.
+     Every step must pass its contrast target on canvas AND card. */
+  --ink-900: #1d2420;
+  --ink-600: #48524c;
+  --ink-400: #636c66;
+
+  /* The accent splits into two ROLES, not two shades:
+     interactive (links, active states — must pass 4.5:1 on canvas) and
+     decorative (fills, illustrations — may be lighter, never carries text).
+     In dark mode the hexes SWAP roles so interactive stays the readable one. */
+  --accent-interactive: #2e6a52;
+  --accent-decorative: #8cbca2;
+
+  /* Serious, not alarming. Errors in most products are recoverable;
+     a full fire-engine red makes users feel at fault. */
+  --danger: #a4463b;
+
+  --border-subtle: #e6e0d5;
+  --border-control: #c9c2b4;
+
+  /* Primary action: graphite fill with warm-white label (see .t-on-accent). */
+  --btn-fill: #2e6a52;
+  --btn-label: #fbfaf5;
+
+  /* ---- Type families ----
+     Newsreader (book serif, loaded from Google Fonts in each page head) for
+     display, titles, and the entry text people reread; the system UI face
+     for everything that is interface. */
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-body: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+
+  /* The only weights the mockup may use. Loading (or synthesizing) extra
+     weights is how type systems quietly rot. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ---- Spacing: 4px scale ----
+     Half steps exist for compact optical alignment; they should not become
+     the default rhythm. Negative margins require a comment explaining why
+     layout structure cannot express the result. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ---- Shape ----
+     Four radii cover a whole product. Resist adding a fifth. */
+  --radius-small: 6px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  /* Horizontal inset of window content; sheets and popovers share it. */
+  --screen-inset: 20px;
+}
+
+/* ---- Type roles ----
+   A role owns family, weight, size, line height, tracking, and default color
+   TOGETHER. Sizes are production points at each window's declared size:
+   mockup px = production pt, 1:1. Desktop scale: interface text is 13 pt
+   (macOS body); the entry text itself is set larger, in the serif, because
+   rereading is the point of the main window.
+
+   Role names match the mobile system so the two map role-for-role. */
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 28px;
+  line-height: 34px;
+  letter-spacing: -0.3px;
+  color: var(--ink-900);
+}
+.t-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 21px;
+  line-height: 27px;
+  letter-spacing: -0.1px;
+  color: var(--ink-900);
+}
+.t-heading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ink-900);
+}
+.t-subheading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--ink-900);
+}
+.t-body-lg {
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--ink-900);
+}
+.t-body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-900);
+}
+.t-callout {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-600);
+}
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+  color: var(--ink-600);
+}
+.t-link {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--accent-interactive);
+}
+.t-on-accent {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--btn-label);
+}
+
+/* ---- Dark palette ----
+   Scoped to screens, not to the page: the gallery canvas is the workbench
+   and stays light, so annotations remain readable while screens go dark.
+   `.theme-dark` on <body> flips every screen (the toolbar toggle does this);
+   `.screen.night` forces one screen dark in both themes — useful for
+   mocking night-time flows next to their daytime siblings.
+
+   Dark is a re-resolution of roles, not an inversion of hexes: surfaces
+   rise slightly instead of going pure black, ink warms instead of going
+   pure white, and the accent hexes swap interactive/decorative roles. */
+.theme-dark .screen,
+.screen.night {
+  --canvas: #151a17;
+  --card: #1f2621;
+  --functional: #1a201c;
+  --selected: #2a332d;
+  --accent-tint: #213029;
+
+  --ink-900: #ecebe4;
+  --ink-600: #b9bdb3;
+  --ink-400: #8d958d;
+
+  --accent-interactive: #8cbca2;
+  --accent-decorative: #2e6a52;
+
+  --danger: #d97c6f;
+
+  --border-subtle: #2b332e;
+  --border-control: #455048;
+
+  --btn-fill: #8cbca2;
+  --btn-label: #12201a;
+}

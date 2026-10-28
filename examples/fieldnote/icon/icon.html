@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fieldnote — app icon</title>
+    <!-- Webfonts for the typeface study ONLY. Masters never depend on them:
+         a letterform that wins gets outlined to paths (outline-text.py). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500&family=Fraunces:wght@500&family=Lora:wght@500&family=Source+Serif+4:wght@600&family=EB+Garamond:wght@500&display=block"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="mockup-core.css" />
+    <link rel="stylesheet" href="icon.css" />
+  </head>
+  <body>
+    <script src="icon.js"></script>
+    <script>
+      /* ===================================================================
+         Fieldnote — app icon exploration.
+         Palette: the product's color roles, copied by NAME from
+         ../mobile/design-system.css (the workbench warns on drift).
+         =================================================================== */
+
+      const R = {
+        canvas: "#f5f1ea",
+        card: "#fffdf9",
+        "accent-tint": "#e8f0ea",
+        "ink-900": "#1d2420",
+        "accent-interactive": "#2e6a52",
+        "accent-decorative": "#8cbca2",
+      };
+      // Dark-theme values of the same roles (the .theme-dark block).
+      const RD = { canvas: "#151a17", card: "#1f2621", "ink-900": "#ecebe4", "accent-interactive": "#8cbca2", "accent-decorative": "#2e6a52" };
+
+      const BLEED = `x="-256" y="-256" width="1536" height="1536"`;
+
+      /* Leaf body, symmetric about the diagonal x + y = 1024. */
+      const LEAF = "M300 724 C 296 470 470 296 744 280 C 728 554 554 728 300 724 Z";
+      const leaf = (p, rib) => `
+        <defs><mask id="rib" maskUnits="userSpaceOnUse" ${BLEED}>
+          <rect ${BLEED} fill="#fff"/>
+          <path d="M366 658 L 612 412" stroke="#000" stroke-width="${rib}" stroke-linecap="round"/>
+        </mask></defs>
+        <g transform="translate(512 512) scale(1.2) translate(-512 -512)">
+          <path d="${LEAF}" fill="${p.mark}" mask="url(#rib)"/>
+          <path d="M306 718 L 250 774" stroke="${p.mark}" stroke-width="36" stroke-linecap="round"/>
+        </g>`;
+
+      const concepts = [
+        {
+          id: "leaf",
+          name: "Leaf as page",
+          direction: "symbol",
+          chosen: true,
+          note: "<b>Chosen.</b> A moss leaf whose midrib is one written line, cut out of the leaf rather than painted on — so it stays a hole in dark, tinted, and monochrome. It says growth-by-small-entries without a book, pen, or letter (the three things every journal icon already uses). Holds its silhouette at 16 px; the shelf has one other leaf, but teal on teal — ours is the only paper-and-moss tile.",
+          palettes: {
+            light: { bg: R.canvas, mark: R["accent-interactive"] },
+            dark: { bg: null, mark: RD["accent-interactive"] },
+            mono: { mark: "#ffffff" },
+          },
+          art: (p) => leaf(p, 30),
+          artSmall: (p) => leaf(p, 46),
+        },
+        {
+          id: "letter-f",
+          name: "F letterform",
+          direction: "letterform",
+          note: "Newsreader F over a moss rule: the product's own display face, so the icon reads as the app's voice. Elegant at 180 px, but at 29 px it is just a letter — and letter monograms are the single most common journal-icon move. Kept as a typeface study, not a candidate. Live text here; would need outlining before export.",
+          palettes: {
+            light: { bg: R.canvas, ink: R["ink-900"], mark: R["accent-interactive"] },
+            dark: { bg: null, ink: RD["ink-900"], mark: RD["accent-interactive"] },
+            mono: { ink: "#ffffff", mark: "#9a9a9a" },
+          },
+          art: (p) => `
+            <text x="512" y="700" text-anchor="middle" font-family="Newsreader, Georgia, serif" font-weight="500" font-size="620" fill="${p.ink}">F</text>
+            <rect x="322" y="760" width="380" height="30" rx="15" fill="${p.mark}"/>`,
+        },
+        {
+          id: "ruled",
+          name: "One ruled line",
+          direction: "abstract",
+          note: "A notebook page with a single line written in moss. The most literal reading of “one sentence a day”, and the calmest. Fails the size test: the faint rules vanish below 40 px and what is left reads as a minus sign or a progress bar.",
+          palettes: {
+            light: { bg: R.card, rule: R["accent-decorative"], mark: R["accent-interactive"] },
+            dark: { bg: null, rule: RD["accent-decorative"], mark: RD["accent-interactive"] },
+            mono: { rule: "#6a6a6a", mark: "#ffffff" },
+          },
+          art: (p) => `
+            <g fill="${p.rule}">
+              <rect x="272" y="372" width="480" height="14" rx="7"/>
+              <rect x="272" y="636" width="480" height="14" rx="7"/>
+              <rect x="272" y="724" width="480" height="14" rx="7"/>
+            </g>
+            <path d="M282 514 C 380 478 470 548 560 506 S 676 486 700 500" fill="none" stroke="${p.mark}" stroke-width="44" stroke-linecap="round"/>
+            <circle cx="752" cy="512" r="26" fill="${p.mark}"/>`,
+        },
+        {
+          id: "sprout",
+          name: "Sprout",
+          direction: "symbol",
+          note: "Two leaves on a stem: the clearest “growth” metaphor. But it is the default habit-tracker and plant-care symbol, it implies progress the product deliberately does not measure (no streaks), and the two leaves fuse into a blob at 29 px.",
+          palettes: {
+            light: { bg: R["accent-tint"], mark: R["accent-interactive"] },
+            dark: { bg: null, mark: RD["accent-interactive"] },
+            mono: { mark: "#ffffff" },
+          },
+          art: (p) => `
+            <g fill="${p.mark}">
+              <path d="M506 590 C 410 594 322 528 306 420 C 414 410 498 476 506 590 Z"/>
+              <path d="M518 500 C 532 380 630 300 752 304 C 748 424 650 500 518 500 Z"/>
+            </g>
+            <path d="M512 770 V 500" stroke="${p.mark}" stroke-width="40" stroke-linecap="round"/>
+            <path d="M332 778 Q 512 738 692 778" fill="none" stroke="${p.mark}" stroke-width="34" stroke-linecap="round"/>`,
+        },
+        {
+          id: "ribbon",
+          name: "Bookmark ribbon",
+          direction: "abstract",
+          note: "A paper ribbon hanging into a moss field, cropped by the top edge. Strongest silhouette of the set and survives every mode. Rejected on meaning: a bookmark marks somebody else's text — a reading app's symbol, not a writing one.",
+          palettes: {
+            light: { bg: R["accent-interactive"], mark: R.card },
+            dark: { bg: null, mark: RD["ink-900"] },
+            mono: { mark: "#ffffff" },
+          },
+          art: (p) => `<path d="M402 -256 H622 V 706 L 512 606 L 402 706 Z" fill="${p.mark}"/>`,
+        },
+      ];
+
+      renderIconWorkbench({
+        title: "Fieldnote — app icon",
+        intro:
+          "Five directions for a private journal: one honest sentence a day. Tone words calm, warm, unhurried; palette paper and moss from the product's design system. Leaf as page is chosen — every platform section below shows it unless you pick another concept in the toolbar.",
+        appName: "Fieldnote",
+        roles: R,
+        designSystem: "../mobile/design-system.css",
+        concepts,
+        typefaces: {
+          glyph: "F",
+          palette: { bg: R.canvas, fg: R["ink-900"] },
+          fonts: [
+            { family: "Newsreader", weight: 500, label: "product display face" },
+            { family: "Fraunces", weight: 500 },
+            { family: "Lora", weight: 500 },
+            { family: "Source Serif 4", weight: 600 },
+            { family: "EB Garamond", weight: 500 },
+          ],
+        },
+        shelf: {
+          // Described, not copied: each tile is a color + motif family seen in
+          // the category. Names are labels for this sheet only.
+          competitors: [
+            { name: "Navy book", bg: "#263a5e", fg: "#f4f1ea", glyph: "book" },
+            { name: "Pink dots", bg: "#f3c7d5", fg: "#b43c6c", glyph: "dots", darkBg: "#4a2633" },
+            { name: "Black pen", bg: "#17181a", fg: "#f2f2f2", glyph: "pen" },
+            { name: "Yellow J", bg: "#f6d36b", fg: "#6e4a00", glyph: "letter:J" },
+            { name: "Violet moon", bg: "#6b4fd8", fg: "#ffffff", glyph: "moon" },
+            { name: "White lines", bg: "#ffffff", fg: "#e0a020", glyph: "bars", darkBg: "#2a2a2c" },
+            { name: "Teal leaf", bg: "#4fa3a5", fg: "#e9f6f6", glyph: "leaf" },
+            { name: "Orange check", bg: "#ff6a3d", fg: "#ffffff", glyph: "check" },
+          ],
+        },
+        pageNotes: [
+          ["Why a leaf and not an F", "The category is crowded with books, pens, and single letters. A letter only works if the name is already known; nobody knows Fieldnote yet. The leaf carries the product's idea (small, organic accumulation) and its palette at once."],
+          ["Cut-outs, not paper-colored strokes", "The midrib is a mask, not a paper-colored line. In dark and tinted modes the background is gone; a painted line would turn into a cream scar on the system plate. A hole stays a hole in every appearance."],
+          ["Dark ships transparent", "The dark variant has no plate of its own: moss lightens to the dark-theme interactive role and the OS supplies the dark background. Tinted ships the leaf in white so the tint lands at full strength."],
+          ["artSmall", "At 16 px the midrib closes up, so favicon and ≤ 32 px renders use a wider cut (46 vs 30 units). Same drawing, one parameter."],
+        ],
+      });
+    </script>
+  </body>
+</html>
