@@ -12,7 +12,7 @@ as screenshots in a real browser: real copy, light and dark themes, and a
 live accessibility audit included.
 
 <p align="center">
-  <img src="social-card.jpg" alt="Design apps in plain HTML — phone-frame calendar mockups at three zoom levels" width="100%" />
+  <img src="social-card.jpg" alt="Design apps in plain HTML — one product as a phone screen, a Mac window, an App Store shot and an app icon" width="100%" />
 </p>
 
 | Skill | For | Frame |
@@ -35,16 +35,11 @@ article:
 
 ## Quick start
 
-Install all four ([70+ supported agents](https://github.com/vercel-labs/skills)):
+One command, works with any supported agent
+([70+ of them](https://github.com/vercel-labs/skills)):
 
 ```bash
 npx skills add euzharkov/app-design-skills
-```
-
-or only the ones you need:
-
-```bash
-npx skills add euzharkov/app-design-skills --skill mobile-mockups --skill store-screenshots
 ```
 
 Then just ask for design work:
