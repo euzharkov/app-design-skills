@@ -1,37 +1,98 @@
-# App Design Skills
+# Mockup Skills
 
-**Design your app in plain HTML instead of Figma — a family of
+**A canvas for app mockups in plain HTML: a family of
 [Agent Skills](https://agentskills.io) for Claude Code, Codex, Cursor,
 Qwen Code, and any agent that reads `SKILL.md`.**
 
-Ask your agent to *"mock up the onboarding flow"*, *"design the settings
-window for the Mac app"*, *"make our App Store screenshots"*, or *"explore
-some app icon directions"*. The right skill picks it up, interviews you,
-builds a small design system for your product, and produces pages you review
-as screenshots in a real browser: real copy, light and dark themes, and a
-live accessibility audit included.
+These skills don't design your app. What goes inside a screen (layout, copy,
+colors, which states exist) is yours. The skills own everything around the
+screens:
+
+- **Grouping**: pages are product areas, sections are flows, columns are
+  screen states, read left to right.
+- **Naming**: every screen has a name (`Today, empty`) and an id
+  (`daily-loop--today-empty`) that links, captures and tickets refer to.
+- **Tags**: `iOS`, `Android`, `macOS`, `Windows`, or a variant (`Plus`),
+  above the frame.
+- **Frames**: phone and desktop windows at production size, 1:1, with each
+  platform's chrome.
+- **Tokens**: one `tokens.css` with your values, wired so a change reaches
+  every screen, rendered live as a tokens section with a contrast audit.
+- **Capture**: every section and screen at a deterministic URL
+  (`?solo=daily-loop&theme=dark&zoom=100`), so screenshots are reproducible.
 
 <p align="center">
-  <img src="social-card.jpg" alt="Design apps in plain HTML — one product as a phone screen, a Mac window, an App Store shot and an app icon" width="100%" />
+  <img src="social-card.jpg" alt="The mockup architecture: a set of phone mockups, with callouts for the URL, the section, a variant tag, screen names and ids, and real-size frames" width="100%" />
 </p>
 
-| Skill | For | Frame |
+| Skill | Lays out | Frame |
 | --- | --- | --- |
-| [`mobile-mockups`](skills/mobile-mockups/SKILL.md) | iOS and Android app screens, flows, design systems | phone, 390×844 |
-| [`desktop-mockups`](skills/desktop-mockups/SKILL.md) | macOS and Windows apps: windows, menu-bar panels, sheets, settings | window, at its real size |
-| [`store-screenshots`](skills/store-screenshots/SKILL.md) | App Store, Google Play and Mac App Store graphics, plus listing text | store canvases, exported to exact sizes |
-| [`app-icon`](skills/app-icon/SKILL.md) | Icon concepts, iOS/Android/macOS variants, export at every size | icon grids and home-screen context |
+| [`mobile-mockups`](skills/mobile-mockups/SKILL.md) | iOS and Android screens and flows | phone, 390×844 |
+| [`desktop-mockups`](skills/desktop-mockups/SKILL.md) | macOS and Windows windows, menu-bar panels, sheets, settings | window, at its declared size |
+| [`store-screenshots`](skills/store-screenshots/SKILL.md) | mockup screens on App Store, Google Play and Mac App Store canvases | store canvases, exported at exact sizes |
 
-All four share one engine and one rule: **a product has one palette.** The
-store screenshots reuse the mockup's screens and colors; the desktop app
-reuses the phone app's color roles; the icon is drawn from the same roles.
-Change a role once and every surface follows.
+All three share one canvas engine and read the same `tokens.css`, so a
+product's phone mockup, desktop mockup and store shots use the same values.
 
-Extracted from real production work, where whole apps were designed this
-way before a line of them was implemented. The story of the original mobile
-skill — why HTML beats Figma when your designer is an agent — is in the
-article:
-**[I Built a Mobile App Mockup Skill](https://open.substack.com/pub/euzharkov/p/i-built-a-mobile-app-mockup-skill)**.
+### mobile-mockups
+
+Phone frames at 390×844 for iOS and Android. Each section is a flow; each
+column is one screen with a name and an id; Android and variant columns
+carry a tag with the platform's glyph.
+
+<p align="center">
+  <img src="examples/cards/mobile.jpg" alt="mobile-mockups: a daily-loop section of phone frames with callouts for the section, the Android platform tag, the Large text variant tag, screen names and ids, and 390×844 frames" width="100%" />
+</p>
+
+### desktop-mockups
+
+macOS and Windows windows at their declared size, with each platform's
+chrome (traffic lights or caption buttons), menu-bar and tray panels,
+sheets and dialogs, on the same tokens as the phone app.
+
+<p align="center">
+  <img src="examples/cards/desktop.jpg" alt="desktop-mockups: a Windows section with callouts for the section, the Windows platform tag, the declared window size, the caption buttons, window names and ids" width="100%" />
+</p>
+
+### store-screenshots
+
+The mockup's own screens placed on App Store, Google Play and Mac App Store
+canvases. Headlines are yours; shots are named by upload order
+(`01-hero`, `02-write`, …), and the name is the file name.
+
+`export.sh` turns the gallery into upload-ready files with headless Chrome:
+
+- each shot is captured at its authoring size times an integer scale
+  (440×956 × 3 = 1320×2868), never by resizing the window, so headlines wrap
+  exactly as they do in the gallery;
+- the capture is then resampled to every size the store asks for: iPhone
+  6.9″ 1320×2868 and 6.5″ 1284×2778, Play phone 1080×1920, Mac 2880×1800
+  and 1280×800, in-app purchase images 1024×1024, the Play feature graphic
+  1024×500, and optionally the Play icon at 512×512 from your own icon;
+- files land in `out/<store>/<slot>/NN-name.png`, and the script reads back
+  and prints every file's real pixel size so a wrong size shows up before
+  upload;
+- it resamples with `sips` on macOS or ImageMagick elsewhere (ImageMagick
+  also strips transparency, which the stores reject).
+
+<p align="center">
+  <img src="examples/cards/store.jpg" alt="store-screenshots: App Store iPhone shots with callouts for the store slot section, the headline, the reused mockup screen, the shot file name, and the exact export sizes" width="100%" />
+</p>
+
+### Tokens, shared by all three
+
+`tokens.css` holds the product's values. The tokens section reads it live:
+every color token as a light-over-dark swatch, every `.t-*` type role with
+its metrics, the spacing and radius scales, and a WCAG 2.1 contrast audit
+of the color pairs the screens use, in both themes. The audit reports; the
+values stay your call.
+
+<p align="center">
+  <img src="examples/cards/tokens.jpg" alt="The tokens section: color token swatches light over dark, type roles with their metrics, spacing and radius scales, and the contrast audit table" width="100%" />
+</p>
+
+The images are rendered from the live examples by
+[`examples/cards/render.sh`](examples/cards/render.sh).
 
 ## Quick start
 
@@ -39,15 +100,16 @@ One command, works with any supported agent
 ([70+ of them](https://github.com/vercel-labs/skills)):
 
 ```bash
-npx skills add euzharkov/app-design-skills
+npx skills add euzharkov/mockup-skills
 ```
 
-Then just ask for design work:
+Then ask:
 
 > mock up the onboarding flow for my app
 
-The matching skill triggers on its own, interviews you about your product,
-and builds from there.
+The matching skill asks where your tokens come from and which platforms you
+ship, scaffolds the canvas into your repo, and lays out the screens you
+describe.
 
 <details>
 <summary><strong>Claude Code plugin marketplace</strong></summary>
@@ -55,11 +117,11 @@ and builds from there.
 This repo is also a Claude Code plugin marketplace. Inside Claude Code:
 
 ```
-/plugin marketplace add euzharkov/app-design-skills
+/plugin marketplace add euzharkov/mockup-skills
 ```
 
-then install the `app-design` plugin from the `/plugin` menu. It contains
-all four skills.
+then install the `mockups` plugin from the `/plugin` menu. It contains all
+three skills.
 
 </details>
 
@@ -82,52 +144,102 @@ startup, so restart the agent after installing.
 </details>
 
 <details>
-<summary><strong>Upgrading from mobile-mockups-skill</strong></summary>
+<summary><strong>Upgrading</strong></summary>
 
-This repo used to be a single skill called `mobile-mockups-skill`. It is now
-`skills/mobile-mockups/`, with the same method and the same files, except
-that the engine is split into `mockup-core.*` (shared) and `phone.*` (the
-frame). Existing mockup directories keep working as they are; the skill
-recognizes the old `mockup.js` layout and leaves it alone unless you ask to
-upgrade. Remove the old `mobile-mockups-skill` folder from your skills
-directory and install `mobile-mockups` to avoid two skills answering the
-same request.
+This repo was `mobile-mockups-skill`, then briefly `app-design-skills`.
+
+- Existing mockup directories keep working. The engine still reads
+  `design-system.css` and `?solo=foundations`; new directories use
+  `tokens.css`, `MOCKUP.md` and `?solo=tokens`. The skills leave old names
+  alone unless you ask to upgrade.
+- Columns can now take a `name`, which gives each screen an id. Old
+  `label: "<b>Name.</b> …"` columns render as before.
+- The `app-icon` skill is gone: an icon is a design asset, not a mockup.
+- Remove `mobile-mockups-skill` or the `app-design` plugin before
+  installing, so two copies don't answer the same request.
 
 </details>
 
+## How it works
+
+A mockup directory is static files:
+
+```
+mockup/
+├── tokens.css          your values, in the structure the canvas reads
+├── MOCKUP.md           the contract: platforms, pages, naming, token table
+├── mockup-core.css/js  the canvas engine
+├── phone.* / window.*  the frame
+├── index.html          tokens section + first area
+└── <area>.html         one page per further area
+```
+
+Each page declares its sections and columns as data and calls
+`renderMockupPage()`:
+
+```js
+renderMockupPage({
+  title: "Settings",
+  sections: [{
+    id: "delete-account",
+    title: "Delete account",
+    cols: [
+      { name: "Account", html: phone(account) },
+      { name: "Delete, confirm", html: phone(confirm) },
+      { name: "Delete, confirm", tag: "Android", tagAccent: true,
+        html: phone(confirmAndroid, { platform: "android" }) },
+    ],
+  }],
+});
+```
+
+The canvas renders the page head, section index, rails of frames, names,
+tags and notes, plus a toolbar for light/dark and zoom. All of it is driven
+by the URL:
+
+| URL | Shows |
+| --- | --- |
+| `?solo=tokens` | the tokens section and contrast audit |
+| `?solo=<section-id>` | one section, for fast loads and reliable captures |
+| `?theme=dark` | dark tokens in every frame |
+| `?zoom=100` | frames at production size |
+| `#<section-id>--<screen>` | one screen |
+
+There is deliberately no component library: screen markup is presentation,
+so production is never pushed to mirror a mockup's components. What moves
+to production is tokens by name, type roles by name, and screen ids as the
+names of states.
+
+### Why HTML
+
+- Agents read, write and diff HTML fluently: no plugin API, no export step.
+- It's versionable: mockup changes are PRs, mockup history is git history.
+- The tokens section reads the real CSS, so it can't drift from it.
+- No build step: a directory of static files and any static server.
+
 ## Examples
 
-One fictional product, **Fieldnote** — a private journal, one honest
-sentence a day — designed across every surface:
+One fictional product, **Fieldnote** (a private journal, one sentence a
+day), on every surface:
 
-- **[Mobile](https://euzharkov.github.io/app-design-skills/examples/fieldnote/mobile/)**
-  — the daily loop, weekly look-back, privacy and deletion, errors and edge
-  content, the largest text size, and the Android differences.
-- **[Desktop](https://euzharkov.github.io/app-design-skills/examples/fieldnote/desktop/)**
-  — the Mac menu-bar quick note, the main journal window, sheets, settings,
-  and a Windows variant, all on the same palette.
-- **[Store screenshots](https://euzharkov.github.io/app-design-skills/examples/fieldnote/store/store.html)**
-  — iPhone, Android and Mac App Store shots, subscription squares and the
-  Play feature graphic, with the export script that renders them to exact
-  store sizes.
-- **[App icon](https://euzharkov.github.io/app-design-skills/examples/fieldnote/icon/icon.html)**
-  — concept round, the chosen direction, and every platform variant.
+- **[Mobile](https://euzharkov.github.io/mockup-skills/examples/fieldnote/mobile/)**
+  — sections for the daily loop (with its Android and large-text twins),
+  the weekly look-back, privacy, and edge cases, with named screens and
+  platform tags.
+- **[Desktop](https://euzharkov.github.io/mockup-skills/examples/fieldnote/desktop/)**
+  — the Mac menu-bar quick note, the journal window, sheets, settings, and
+  Windows columns, on the same tokens.
+- **[Store screenshots](https://euzharkov.github.io/mockup-skills/examples/fieldnote/store/store.html)**
+  — iPhone, Android and Mac App Store shots built from the mockup screens,
+  with the script that exports them at exact store sizes.
 
-Fidelity studies of real apps, built with the mobile skill:
+Older studies built with the original mobile skill:
+[iOS Calendar](https://euzharkov.github.io/blog/mobile-mockups-skill-examples/ios-calendar/)
+and [Gmail iOS](https://euzharkov.github.io/blog/mobile-mockups-skill-examples/gmail/).
+The story of that skill is in the article
+**[I Built a Mobile App Mockup Skill](https://open.substack.com/pub/euzharkov/p/i-built-a-mobile-app-mockup-skill)**.
 
-- **[iOS Calendar study](https://euzharkov.github.io/blog/mobile-mockups-skill-examples/ios-calendar/)**
-  — day/year/month/list views and the iOS 26 "New" sheet, with Apple's own
-  sub-AA contrast choices flagged (not hidden) by the audit.
-- **[Gmail iOS study](https://euzharkov.github.io/blog/mobile-mockups-skill-examples/gmail/)**
-  — inbox rows, the drawer, a thread, compose with a simulated keyboard, and
-  the account sheet, with all mail data replaced by fictional equivalents.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/euzharkov/blog/main/mobile-mockups-skill-examples/ios-calendar/ios-calendar-mockup-demo.gif" alt="Animated tour of the iOS Calendar fidelity study" width="49%" />
-  <img src="https://raw.githubusercontent.com/euzharkov/blog/main/mobile-mockups-skill-examples/gmail/gmail-mockup-demo.gif" alt="Animated tour of the Gmail fidelity study" width="49%" />
-</p>
-
-To run the examples locally, start any static server at the repo root:
+To run the Fieldnote examples locally, serve the repo root:
 
 ```bash
 python3 -m http.server 4680
@@ -135,74 +247,18 @@ python3 -m http.server 4680
 
 then open `http://localhost:4680/examples/fieldnote/mobile/`.
 
-## Why HTML instead of Figma?
-
-When your designer is an agent, a design tool is the wrong medium. Static
-HTML is the right one:
-
-- **Agents are native here.** They read, write, and diff HTML/CSS fluently —
-  no plugin API, no export step, no screenshots-of-canvases.
-- **It's versionable.** Design reviews become PRs. Design history becomes
-  git history.
-- **The style guide can't lie.** The auto-generated foundations page renders
-  palette, type ramp, spacing, and radii live from the actual CSS, plus a
-  WCAG contrast audit for both themes. Drift is impossible.
-- **Copy is real.** Screens carry shippable words, so the mockup doubles as
-  the copy spec. Production takes text from it 1:1.
-- **Handoff is honest.** Design values map to your production theme 1:1 by
-  role name, and sizes in the mockup are the sizes you ship. No redlines, no
-  eyedropper.
-- **No build step.** A directory of static files and any static server.
-
-## How it works
-
-Every skill follows the same two layers, nothing else:
-
-1. **A design system** — `design-system.css`: flat semantic values (color
-   roles, type roles, spacing, radii, one dark override block) plus
-   `DESIGN-SYSTEM.md`, the written contract that keeps agents honest across
-   sessions.
-2. **Pages** — one HTML page per flow area; sections are flows, frames are
-   states.
-
-There is deliberately **no component library** in between — mockup classes
-are presentation hooks, so your production app is never pressured to mirror
-a fake component API.
-
-The mockup skills interview you, scaffold the starter canvas into your repo,
-build the design system until the contrast audit is green, build screens
-with a states discipline (empty, loading, error, edge — not just the happy
-path), review their own work as light and dark screenshots, and hand off
-values by role into your production theme. The store and icon skills start
-from that design system and end in exported files.
-
-### The workbench
-
-`mockup-core.js` + `mockup-core.css` render the gallery around your frames;
-`phone.*` and `window.*` draw the devices:
-
-- frames authored 1:1 with production units (390×844 pt for phones; desktop
-  windows at their real size)
-- light/dark toggle and zoom, all URL-driven (`?theme=dark&zoom=70`), so
-  every screenshot is reproducible
-- **solo mode** (`?solo=section-id`): one section only, for fast loads and
-  reliable captures on long pages
-- auto-generated foundations section + WCAG 2.1 contrast audit, read live
-  from your `design-system.css`
-
 ## Repository layout
 
 ```
-app-design-skills/
+mockup-skills/
 ├── skills/
 │   ├── mobile-mockups/      # SKILL.md, assets/ (starter canvas), references/
 │   ├── desktop-mockups/
-│   ├── store-screenshots/
-│   └── app-icon/
+│   └── store-screenshots/
 ├── shared/                  # the one place shared files are edited
 │   ├── assets/              # mockup-core.*, phone.*, window.*
-│   └── references/          # design-system.md, review.md, handoff.md
-├── examples/fieldnote/      # one fictional product across all four skills
+│   └── references/          # canvas.md, tokens.md, review.md, handoff.md
+├── examples/fieldnote/      # one fictional product across all three skills
 └── scripts/sync.sh          # copies shared/ into each skill and example
 ```
 

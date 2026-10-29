@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fieldnote — store screenshots</title>
     <!-- Same <head> as ../mobile/index.html: same fonts, same icon library,
-         the SAME design-system.css. The store set never gets its own palette. -->
+         same token file. The store page adds layout, not values. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../mobile/design-system.css" />
+    <link rel="stylesheet" href="../mobile/tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="phone.css" />
     <link rel="stylesheet" href="window.css" />
@@ -17,9 +17,9 @@
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
-      /* ---- Screen CSS, copied verbatim from ../mobile/index.html ----
-         The store shows the product as it is designed. When the mockup's
-         screen CSS changes, copy it again — don't restyle it here. */
+      /* ---- Screen CSS, copied unchanged from ../mobile/index.html ----
+         When the mockup's screen CSS changes, copy it again; don't restyle
+         it here. */
       .stack > * + * {
         margin-top: var(--space-3);
       }
@@ -283,7 +283,7 @@
         font-size: 23px;
         line-height: 30px;
       }
-      /* ---- Store-only composition (not product UI) ---- */
+      /* ---- Frame layout for this page (not product UI) ---- */
 
       /* Feature graphic art: today's card and one quoted line, at reduced
          scale so the product's own surfaces carry the graphic. */
@@ -318,9 +318,9 @@
     <script>
       /* ================= screens =================
          Copied from ../mobile/index.html and turned into functions of
-         platform, so the Play cut gets Android chrome and Android wording
-         (fingerprint, Google backup) from the same source. In-device copy is
-         the product's real copy — never marketing paraphrase. */
+         platform, so the Play cut gets Android chrome and the Android
+         wording the mockup already has (fingerprint, Google backup) from the
+         same source. Screen content is unchanged from the mockup. */
       const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
 
       const TABS = [
@@ -494,8 +494,8 @@
         );
 
       /* ================= frames =================
-         promise → evidence → explanation. One idea per frame; the headline
-         is the benefit, the device is the proof. */
+         In upload order. Headlines and captions are the example's given
+         wording; ids + position give the export names (01-hero.png). */
       renderStorePage({
         title: "Fieldnote — store screenshots",
         intro:
@@ -578,8 +578,8 @@
           },
         ],
         pageNotes: [
-          note("Story order", "Promise (one sentence a day) → evidence (writing, the Sunday look-back) → a night beat mid-rail → explanation (no streaks, privacy). Frames 1–3 carry the listing; most people never swipe past them."),
-          note("Copy inside the device", "Every in-device word is copied from ../mobile/index.html. Headlines sell the benefit; the screen proves it with the product's own sentences."),
+          note("Screens", "Every device is a screen from ../mobile/index.html, copied unchanged and made a function of platform. The Mac frames compose the same cards in a window until ../desktop has its own screens."),
+          note("Wording and order", "Headlines, captions and order are the example's given wording, not something the skill chose."),
         ],
       });
     </script>

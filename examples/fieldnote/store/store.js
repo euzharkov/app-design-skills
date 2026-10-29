@@ -23,7 +23,7 @@
  * scale, a platform-specific headline, a different device).
  *
  * URL modes (deterministic, for capture):
- *   (none)                     gallery: every frame + marketing-text contrast audit
+ *   (none)                     gallery: every frame + store-text contrast audit
  *   ?shot=N                    iPhone frame N alone at the page origin
  *   ?shot=N&platform=android   the same frame cut to the Play 9:16 aspect
  *   ?sub=N                     IAP / subscription promo square N
@@ -31,6 +31,13 @@
  *   ?mac=N                     Mac App Store frame N
  *   &theme=dark                any of the above with dark screens
  *   ?manifest                  plain-text list "kind index name" for export.sh
+ *
+ * Naming: each frame's export name is "NN-<id>" (NN = 1-based position in
+ * its array; subs use the bare id; the feature graphic is "feature-graphic").
+ * The same name is the gallery column's `name`, so a frame's screen id is
+ * <section-id>--<export name>[--<tag>]: iphone--01-hero,
+ * android--01-hero--android, mac--01-mac-today--macos, subs--plus-monthly. The manifest hands those names to
+ * export.sh, which uses them as PNG file names.
  *
  * This file is workbench code, not product code. You should rarely edit it.
  */
@@ -128,12 +135,12 @@ function storeManifest(cfg) {
   return lines.join("\n");
 }
 
-/* ================= marketing-text contrast audit ================= */
+/* ================= store-text contrast audit ================= */
 
-/* Headlines sit on marketing backgrounds the product audit never sees, so
-   they get their own pass: every frame's text against the frame's plain
-   background role, in light and dark. Also reports headline line count —
-   the "one line where possible" rule, made visible. */
+/* Store text sits on frame backgrounds the tokens-section audit never sees,
+   so it gets its own pass: every frame's text against the frame's plain
+   background role, in light and dark. It also reports the headline's line
+   count and whether the copy band overflows into the device. */
 function storeAudit(root) {
   const frames = [...root.querySelectorAll(".shot, .subshot:not(.thumb), .featshot, .macshot")];
   const TEXT = [
@@ -179,7 +186,7 @@ function storeAudit(root) {
       html += `<tr><td>${name}</td><td>${fr.classList.contains("night") ? "night" : theme}</td>${cell(m.cells[0])}${cell(m.cells[1])}${cell(m.cells[2])}<td class="${h && h.lines > maxLines ? "bad" : ""}">${h ? h.lines : "–"}</td><td class="${m.overflow ? "bad" : ""}">${m.overflow ? "overflows ✕" : "fits"}</td></tr>`;
     }
   });
-  html += `</table></div><p class="fd-pair-note">Text against the frame's plain background role (the wash is decoration and must stay close to it). Headlines ≥ 24px need 3:1; captions and eyebrows need 4.5:1. A headline over two lines (three on the hero) is a headline that should be shorter. Fix colors in design-system.css roles, copy in the page.</p>`;
+  html += `</table></div><p class="fd-pair-note">Text against the frame's plain background role; the glow is not measured. WCAG 2.1: text ≥ 24px (or ≥ 18.5px bold) needs 3:1, smaller text 4.5:1. Line counts above two (three on a hero frame) and an overflowing copy band are flagged because the band has fixed height. The audit reports; colors are tokens.css values and copy is the person's call.</p>`;
   return html;
 }
 
@@ -215,47 +222,53 @@ function renderStorePage(cfg) {
   }
 
   /* ---- gallery ---- */
-  const col = (html, label, tag) => ({ html, label, tag });
-  const tagFor = (s) => (s.hero ? "Hero" : s.night ? "Night" : "");
+  /* Gallery columns are named by export name, so the screen id matches the
+     PNG. Tags mark platform only (the page's primary platform is iOS);
+     hero and night are frame options, noted in the label, never tags. */
+  const col = (name, html, label, tag) => ({ name, html, label, tag, tagAccent: !!tag });
+  const labelFor = (s) => s.label || [s.hero && "Hero frame.", s.night && "Night: dark in both themes."].filter(Boolean).join(" ");
   const sections = [];
   if (shots.length)
     sections.push({
       id: "iphone",
       title: "App Store · iPhone",
-      desc: "Authored 440×956, captured ×3 → 1320×2868 (6.9″), resampled → 1284×2778 (6.5″). Order is the story: promise → evidence → explanation.",
-      cols: shots.map((s, i) => col(storeShot(s, "ios"), s.label || `<b>${i + 1}.</b> ${s.id || ""}`, tagFor(s))),
+      desc: "Authored 440×956, captured ×3 → 1320×2868 (6.9″), resampled → 1284×2778 (6.5″). Left to right in upload order.",
+      cols: shots.map((s, i) => col(storeName(s, i, "shot"), storeShot(s, "ios"), labelFor(s))),
     });
   if (shots.length && cfg.android !== false)
     sections.push({
       id: "android",
       title: "Google Play · phone",
       desc: "The same frames cut to 9:16 (440×782 → ×3 → 1080×1920). Android chrome and any per-shot overrides applied.",
-      cols: shots.map((s, i) => col(storeShot(s, "android"), s.label || `<b>${i + 1}.</b> ${s.id || ""}`, tagFor({ ...s, ...(s.android || {}) }))),
+      cols: shots.map((s, i) => col(storeName(s, i, "shot"), storeShot(s, "android"), labelFor({ ...s, ...(s.android || {}) }), "Android")),
     });
   if (subs.length)
     sections.push({
       id: "subs",
       title: "In-app purchase images",
       desc: "512×512 → ×2 → 1024×1024. Each square is shown next to the ~64px thumbnail the store actually renders beside its own price text.",
-      cols: subs.flatMap((s) => [col(storeSub(s), `<b>${s.word}</b> ${s.tag || ""}`), col(storeSub(s, true), "thumbnail")]),
+      cols: subs.flatMap((s, i) => {
+        const name = s.id || "sub-" + pad2(i + 1);
+        return [col(name, storeSub(s), s.label || ""), col(name + ", thumbnail", storeSub(s, true), "Approximate store size.")];
+      }),
     });
   if (cfg.feature)
     sections.push({
       id: "feature",
       title: "Play feature graphic",
-      desc: "512×250 → ×2 → 1024×500. Play crops it and may overlay a play button; keep the promise in the left half.",
-      cols: [col(storeFeature(cfg.feature), "Feature graphic")],
+      desc: "512×250 → ×2 → 1024×500. Some Play surfaces crop it and overlay a play button in the center.",
+      cols: [col("feature-graphic", storeFeature(cfg.feature), "", "Android")],
     });
   if (mac.length)
     sections.push({
       id: "mac",
       title: "Mac App Store",
       desc: "Authored 1440×900, captured ×2 → 2880×1800 (16:10); resampled to 1440×900 / 1280×800 if wanted.",
-      cols: mac.map((s, i) => col(storeMac(s), s.label || `<b>${i + 1}.</b> ${s.id || ""}`, tagFor(s))),
+      cols: mac.map((s, i) => col(storeName(s, i, "mac"), storeMac(s), labelFor(s), "macOS")),
     });
   sections.push({
     id: "contrast",
-    title: "Marketing text contrast",
+    title: "Store text contrast",
     desc: "Every frame's headline, caption and eyebrow against its background role, light and dark — measured from the rendered frames above.",
     cols: [],
   });
@@ -277,15 +290,14 @@ function renderStorePage(cfg) {
     if (!document.querySelector(".shot, .subshot, .featshot, .macshot")) {
       root = document.createElement("div");
       root.style.cssText = "position:absolute;left:-99999px;top:0";
+      const group = (title, frames) => (frames.length ? `<div class="sec"><h2>${title}</h2>${frames.join("")}</div>` : "");
       root.innerHTML = [
-        ...shots.map((s) => storeShot(s, "ios")),
-        ...shots.map((s) => storeShot(s, "android")),
-        ...subs.map((s) => storeSub(s)),
-        cfg.feature ? storeFeature(cfg.feature) : "",
-        ...mac.map(storeMac),
-      ]
-        .map((h) => `<div class="sec"><h2>frame</h2>${h}</div>`)
-        .join("");
+        group("App Store · iPhone", shots.map((s) => storeShot(s, "ios"))),
+        cfg.android !== false ? group("Google Play · phone", shots.map((s) => storeShot(s, "android"))) : "",
+        group("In-app purchase images", subs.map((s) => storeSub(s))),
+        group("Play feature graphic", cfg.feature ? [storeFeature(cfg.feature)] : []),
+        group("Mac App Store", mac.map(storeMac)),
+      ].join("");
       document.body.appendChild(root);
     }
     const run = () => {

@@ -1,180 +1,147 @@
 ---
 name: mobile-mockups
 description: >-
-  Design phone app UI (iOS and Android) in plain HTML instead of Figma: build
-  a per-project design system (semantic color roles, type roles, spacing —
-  as CSS custom properties with a live WCAG contrast audit), then compose
-  phone-frame mockup screens that an AI agent can create, screenshot,
-  critique, and iterate on directly in the browser. Use whenever the user
-  wants mobile app mockups, wireframes, screen designs, UI concepts, a design
-  system, a style guide, a design review of planned screens, or says things
-  like "mock up this feature", "design the onboarding", "how should this
-  screen look", "explore some UI directions" for a phone app — even if they
-  never say the word "mockup" or mention HTML. Also use when asked to extend
-  or restyle an existing phone mockup directory built with this method.
-  Desktop apps (macOS, Windows, menu-bar apps) belong to desktop-mockups;
-  store listing graphics to store-screenshots; app icons to app-icon.
+  Lay out phone app mockups (iOS and Android) as plain HTML pages: a
+  workbench canvas that groups screens into pages and sections, names every
+  screen, tags platforms and variants, draws the phone frame at production
+  size, wires the product's values through a token file with a live tokens
+  section and contrast audit, and captures any section or screen from a
+  deterministic URL. Use whenever the user wants phone app mockups, screen
+  mockups, wireframes, a flow laid out as screens, a mockup gallery, or says
+  "mock up this feature", "show the onboarding as screens", "put these
+  screens side by side" for a phone app, even if they never mention HTML.
+  Also use to extend, reorganize or capture an existing mockup directory
+  built this way. What goes inside each screen is the user's; the skill
+  owns the canvas around it. Desktop apps belong to desktop-mockups; store
+  listing graphics to store-screenshots.
 ---
 
 # Mobile Mockups
 
-Design in the medium you ship. This skill turns a plain directory of static
-HTML into a Figma replacement that is *better* for agent-driven work: you can
-read it, write it, diff it, version it, screenshot it, and audit its
-accessibility — none of which an agent can do inside a design tool.
+A mockup has two parts: the screens, and the canvas they sit on. This skill
+owns the canvas. It decides how screens are grouped, what each one is
+called, how platforms and variants are tagged, how the phone is framed, how
+the product's values reach every screen, and how any of it is captured.
 
-The method has exactly two layers, and holding that line is what keeps it
-fast:
+It does not decide what is inside a screen. Layout, copy, colors, which
+states to show, how the product behaves: those come from the person. Build
+what they describe. Where they leave a gap, fill it with the plainest
+plausible content and record the assumption in a note. Don't redesign or
+critique screen content unless asked.
 
-1. **Flat shared design values** — `design-system.css`: semantic colors, type
-   roles (`.t-*` classes), spacing, radii. One file, both themes.
-2. **Screens** — HTML pages that compose those values with page-local CSS and
-   JS template helpers. Deliberately **no component library, no tokens-of-
-   tokens, no build step**: mockup classes are presentation hooks, and
-   production is never pressured to mirror a fake component API.
+The canvas is a directory of static HTML. No build step, no component
+library. An agent can write it, diff it, version it, and screenshot it.
 
-A written contract (`DESIGN-SYSTEM.md`) makes the system enforceable across
-sessions, and the workbench (`mockup-core.js`) auto-renders a foundations page —
-palette, type ramp, spacing, radii, and a live WCAG contrast audit — straight
-from the CSS, so the style guide cannot drift from reality.
+Part of a family that shares the canvas engine (`mockup-core.*`):
+**desktop-mockups** (macOS and Windows windows, menu-bar panels) and
+**store-screenshots** (store listing graphics built from these screens).
 
-Part of a family: **desktop-mockups** (macOS/Windows windows, menu-bar
-panels), **store-screenshots** (App Store / Play graphics built from these
-screens), **app-icon** (icon concepts and platform exports). They share the
-engine (`mockup-core.*`) and the color roles; hand off to them rather than
-drawing desktop windows or store graphics here.
+## Phase 0: detect state
 
-## Phase 0 — Detect state
+Look for an existing mockup directory: `mockup-core.js` next to `tokens.css`
+and `MOCKUP.md`. Older directories have `design-system.css`,
+`DESIGN-SYSTEM.md`, and sometimes `mockup.js` instead; they are the same
+method. Leave the old names alone unless the person asks to upgrade.
 
-Look for an existing mockup directory (`design-system.css` +
-`DESIGN-SYSTEM.md` + `mockup-core.js` together; older directories have
-`mockup.js` instead — same method, leave it as it is unless asked to
-upgrade). If found: read
-`DESIGN-SYSTEM.md` fully, respect it as the contract, and jump to whichever
-phase the request needs (usually Phase 4 for new screens, Phase 3 for
-restyling). Never rebuild a system that exists; never normalize old screens
-you weren't asked to touch.
+If one exists, read `MOCKUP.md`, follow its naming and page list, and go to
+the phase the request needs (usually Phase 3). Don't touch screens you
+weren't asked to touch.
 
-If a sibling directory exists for another surface of the same product (a
-desktop mockup, say), reuse its color roles verbatim — see
-`references/design-system.md` § Sibling systems.
+If a sibling mockup exists for another surface of the same product (a
+desktop mockup, say), take its color tokens verbatim; see
+`references/tokens.md`.
 
-If starting fresh, continue in order. Phases 1–3 end with the user approving
-the foundations; phases 4–5 loop per flow.
+## Phase 1: setup questions
 
-## Phase 1 — Discovery
+One batched round, only about the canvas:
 
-Read `references/design-system.md` § Discovery, ask its interview (one
-batched round: product & audience, three tone words, platform (iOS,
-Android, both), existing brand, light+dark?, context of use, icon
-library). If the user is unavailable
-or brief, pick defaults from the product context and say which assumptions
-you made.
+- Platforms: iOS, Android, or both, and which is primary.
+- Where token values come from: a production theme to import (path), a
+  sibling mockup, or values they'll give (brand colors, fonts).
+- Light and dark, or light only.
+- Fonts and the icon library the product uses.
+- Where the mockup directory should live (default `design/mockup/`).
+- The areas and flows to lay out first.
 
-## Phase 2 — Scaffold
+If the person is brief, take the defaults (iOS primary, light and dark,
+starter placeholders, system fonts) and say which you took.
 
-1. Copy every file from this skill's `assets/` directory into the project —
-   default `design/mockup/` (or `mockup/` at the repo root, or where the user
-   prefers): `design-system.css`, `mockup-core.css`, `mockup-core.js`,
-   `phone.css`, `phone.js`, `index.html`, `flow.html`, `DESIGN-SYSTEM.md`.
-2. Wire up serving (any static server; foundations need http, not `file://`)
-   — see `references/review.md` § Serving for the launch-config pattern.
-3. Open the page once to confirm the starter renders: foundations plus one
-   example section ("Fieldnote").
+## Phase 2: scaffold
 
-The starter ships with a neutral placeholder system — warm paper, graphite
-ink, indigo accent. It exists so the canvas renders before Phase 3; it is not
-a recommendation.
+1. Copy every file from this skill's `assets/` into the mockup directory:
+   `tokens.css`, `mockup-core.css`, `mockup-core.js`, `phone.css`,
+   `phone.js`, `index.html`, `flow.html`, `MOCKUP.md`.
+2. Wire up serving (any static server; the tokens section needs http, not
+   `file://`). See `references/review.md` § Serving.
+3. Open the page once: the tokens section and one example section should
+   render.
 
-## Phase 3 — Design the system
+## Phase 3: tokens
 
-Follow `references/design-system.md` §2–7:
+Follow `references/tokens.md`: import or enter the product's values into
+`tokens.css`, keeping its structure (color tokens, `--font-*`, `--weight-*`,
+`--space-*`, `--radius-*`, `.t-*` type roles, one dark block). List the
+color pairs screens will use in `contrastPairs`. Fill the token tables in
+`MOCKUP.md`. Open `?solo=tokens` in light and dark and check that nothing is
+unresolved. Show the person the tokens section and any failing contrast
+pairs; the values are theirs to change.
 
-1. Translate the discovery answers into role values in `design-system.css` —
-   surfaces, ink scale, the interactive/decorative accent split, status
-   colors, both themes. Adjust type roles, spacing, radii to the product.
-2. Update `contrastPairs` in `index.html` to cover every fg/bg pair the
-   product will use.
-3. Fill `DESIGN-SYSTEM.md` — it's a template with `{{placeholders}}`; the
-   product-context paragraph and role tables must reflect the real system.
-4. Open `?solo=foundations`, light and dark. Iterate until the contrast
-   audit is green and the palette reads as one family.
-5. Show the user foundations screenshots; get sign-off before building
-   screens. Changing a role later is cheap; discovering the temperature is
-   wrong after twenty screens is not.
+## Phase 4: lay out screens
 
-## Phase 4 — Build screens
+Follow `references/canvas.md` for grouping, naming, tags and notes, and
+`references/frame.md` for the phone frame:
 
-Follow `references/screens.md`. The short version:
+- One page per product area (copy `flow.html`); one section per flow; one
+  column per screen state, in the order the user meets them.
+- Every column has a `name`: the product's name for the screen, then the
+  state after a comma (`Today, empty`). That gives it the id
+  `<section-id>--today-empty`.
+- Platform tags (`iOS`, `Android`) on every column off the page's primary
+  platform; variant tags (`Free`, `Plus`) for variants. States go in the
+  name, not a tag.
+- `phone(html, {platform, tab, back, footer, night, bare})` frames each
+  screen; set `PHONE_PLATFORM` once for an Android-first page.
+- Inside frames, values come from tokens: `var(--…)` and `.t-*` classes.
+- Notes record decisions the person made, and assumptions you made.
+- Delete the starter's example section once real sections exist.
 
-- One page per flow area (`flow.html` is the blank); sections are flows,
-  phones are states, authored as JS template literals via `phone()` /
-  `tabbar()` and page-local helpers.
-- Platform: `phone(html, {platform: "android"})`, or set
-  `PHONE_PLATFORM = "android"` once per page. Read
-  `references/platforms/ios.md` or `android.md` for the conventions that
-  change between them; for a two-platform product, mock the shared flow once
-  and add tagged Android columns only where the platforms genuinely differ.
-- Screens compose design-system values only — no new hexes, no ad-hoc font
-  sizes. Type is `.t-*` classes on the markup.
-- **States discipline**: mock empty, loading, error, and edge-content states,
-  not just the happy path — that's where design actually happens.
-- **Copy is spec**: real words in the product voice, plausible data, no
-  lorem ipsum. Production takes user-facing text from the mockup 1:1.
-- **Annotate**: column labels say what each state shows; `note()` cards carry
-  the why. Decisions live in the mockup, not in chat history.
-- Delete the "Fieldnote" example section once real sections exist.
+## Phase 5: capture and check
 
-## Phase 5 — Review loop
+Follow `references/review.md`: check the console, capture each new section
+via `?solo=<id>` in light and dark, name captures by screen id, and run the
+canvas checklist (grouping, names, tags, frames, tokens, labels). Show the
+person two to four captures at a time, each with its screen id.
 
-Follow `references/review.md` after every meaningful chunk: check the
-console, screenshot each new section via `?solo=<id>` (light and dark), run
-the seven-point critique (hierarchy, rhythm, type honesty, contrast, touch
-targets, states coverage, copy), fix in source, then show the user curated
-screenshots with a specific question.
+## Phase 6: handoff (when asked)
 
-Screenshot long pages section-by-section with `?solo=` — full-page deep
-scrolls freeze headless captures. When the user asks for a global change
-("warmer", "bigger text"), change role values in `design-system.css`, not
-individual screens.
+Follow `references/handoff.md`: tokens and type roles map to production by
+name, screen ids name states everywhere (tickets, tests, parity snapshots),
+canvas and frame code never transfers.
 
-## Phase 6 — Handoff (when asked)
+## Rules
 
-When the user moves to implementation, follow `references/handoff.md`:
-values and type roles map 1:1 by role name into the production theme, copy
-transfers verbatim, layout transfers by intent, and mockup class names/DOM
-transfer never. Keep the mockup alive as the design source of truth —
-design changes go mockup-first, implementation deviations get back-ported by
-role and intent.
-
-## The rules that hold the method together
-
-- Two layers only. The moment a "shared component" tier appears, delete it.
-- Semantic roles, never colors by appearance. Interactive accent ≠
-  decorative accent; the hexes may swap between themes.
-- Mockup px = production pt (iOS) / dp (Android), 1:1 at 390×844. No
-  scaled mental math.
-- Every value change keeps `design-system.css`, `DESIGN-SYSTEM.md`, and
-  `contrastPairs` in sync in the same edit.
-- The contrast audit is a gate, not a dashboard: fails get fixed in role
-  values, never hidden.
-- `mockup-core.*` and `phone.*` are the workbench — raw colors allowed,
-  product values forbidden; you should rarely edit them.
+- The canvas is neutral and the same for every product. Never edit
+  `mockup-core.*` or `phone.*` for one product.
+- Frames are 390×844 at 1:1. Display size changes only through `?zoom=`.
+- Nothing product-shaped outside a frame; explanations go in labels and
+  notes.
+- Every screen has a name; section ids never change once shared.
+- `tokens.css`, the token tables in `MOCKUP.md`, and `contrastPairs` change
+  in the same edit.
+- The contrast audit reports; the person decides.
 
 ## Files
 
 | Path | What it is |
 | --- | --- |
-| `assets/design-system.css` | Starter Layer-1 values + `.t-*` roles + dark block (placeholder palette) |
-| `assets/mockup-core.css` | Workbench chrome: canvas, toolbar, rails, notes, foundations styles (shared by the family) |
-| `assets/mockup-core.js` | Engine: `note()`, `renderMockupPage()`, foundations auto-doc, WCAG audit, `?solo/theme/zoom` (shared) |
-| `assets/phone.css` / `assets/phone.js` | Phone frame: `phone()`, `tabbar()`, status bar, iOS/Android variants |
-| `assets/index.html` | Starter canvas with foundations + deletable "Fieldnote" example |
-| `assets/flow.html` | Blank template for additional flow pages |
-| `assets/DESIGN-SYSTEM.md` | Contract template with `{{placeholders}}` |
-| `references/design-system.md` | Phase 1+3 in depth: interview, roles, dark theme, type, contrast |
-| `references/screens.md` | Phase 4 in depth: anatomy, helpers, states, copy, annotations |
-| `references/review.md` | Phase 5 in depth: serving, solo screenshots, critique checklist |
-| `references/handoff.md` | Phase 6 in depth: role mapping, theme export, parity checks, keeping mockups alive |
-| `references/platforms/ios.md` | iOS conventions: navigation, tab bar, sheets, Dynamic Type, safe areas |
-| `references/platforms/android.md` | Android conventions: Material 3 navigation, top app bars, back, dp, edge-to-edge |
+| `assets/tokens.css` | Token file: structure to keep, placeholder values to replace |
+| `assets/mockup-core.css` / `.js` | Canvas engine: page head, sections, named columns, tags, notes, tokens section, audit, `?solo/theme/zoom` (shared by the family) |
+| `assets/phone.css` / `.js` | Phone frame: `phone()`, `tabbar()`, status bar, iOS and Android chrome |
+| `assets/index.html` | Starter page: tokens section and a deletable example section |
+| `assets/flow.html` | Blank page for further areas |
+| `assets/MOCKUP.md` | Contract template: surfaces, pages, naming, token tables |
+| `references/canvas.md` | Skeleton, grouping, naming, tags, notes, canvas style rules |
+| `references/tokens.md` | Token sources, file structure, naming, dark theme, contrast pairs |
+| `references/frame.md` | The phone frame API and platform chrome |
+| `references/review.md` | Serving, URLs, capturing, the canvas checklist |
+| `references/handoff.md` | What transfers to production and how |

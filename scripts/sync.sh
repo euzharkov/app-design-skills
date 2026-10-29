@@ -18,16 +18,14 @@ CHECK=0
 # skill's own engine files too)
 MANIFEST='
 skills/mobile-mockups/assets          assets/mockup-core.js assets/mockup-core.css assets/phone.js assets/phone.css
-skills/mobile-mockups/references      references/design-system.md references/review.md references/handoff.md
+skills/mobile-mockups/references      references/canvas.md references/tokens.md references/review.md references/handoff.md
 skills/desktop-mockups/assets         assets/mockup-core.js assets/mockup-core.css assets/window.js assets/window.css
-skills/desktop-mockups/references     references/design-system.md references/review.md references/handoff.md
+skills/desktop-mockups/references     references/canvas.md references/tokens.md references/review.md references/handoff.md
 skills/store-screenshots/assets       assets/mockup-core.js assets/mockup-core.css assets/phone.js assets/phone.css assets/window.js assets/window.css
-skills/store-screenshots/references   references/review.md
-skills/app-icon/assets                assets/mockup-core.css
+skills/store-screenshots/references   references/tokens.md references/review.md
 examples/fieldnote/mobile             assets/mockup-core.js assets/mockup-core.css assets/phone.js assets/phone.css
 examples/fieldnote/desktop            assets/mockup-core.js assets/mockup-core.css assets/window.js assets/window.css
 examples/fieldnote/store              assets/mockup-core.js assets/mockup-core.css assets/phone.js assets/phone.css assets/window.js assets/window.css skills/store-screenshots/assets/store.js skills/store-screenshots/assets/store.css skills/store-screenshots/assets/export.sh
-examples/fieldnote/icon               assets/mockup-core.css skills/app-icon/assets/icon.js skills/app-icon/assets/icon.css skills/app-icon/assets/export-icons.sh skills/app-icon/assets/outline-text.py
 '
 
 status=0

@@ -7,14 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="phone.css" />
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
       /* Layer 2: screen CSS for this page. Every value comes from
-         design-system.css; classes are presentation hooks, not components. */
+         tokens.css; classes are presentation hooks, not components. */
       .stack > * + * {
         margin-top: var(--space-3);
       }
@@ -505,7 +505,7 @@
       renderMockupPage({
         title: "Fieldnote — mobile",
         intro:
-          "Example product for the mobile-mockups skill: a private journal, one honest sentence a day. Sibling surfaces: <a href='../desktop/'>desktop</a> · <a href='../store/store.html'>store screenshots</a> · <a href='../icon/icon.html'>app icon</a>.",
+          "Example product for the mobile-mockups skill: a private journal, one honest sentence a day. Sibling surfaces: <a href='../desktop/'>desktop</a> · <a href='../store/store.html'>store screenshots</a>.",
         contrastPairs: [
           ["--ink-900", "--canvas"],
           ["--ink-900", "--card"],
@@ -525,16 +525,20 @@
           {
             id: "daily-loop",
             title: "Daily loop",
-            desc: "Open, write one sentence, close. Everything else is optional and stays out of the way.",
+            desc: "Open, write one sentence, close. Android and large-text variants sit next to the screens they vary.",
             cols: [
-              { label: "<b>Today.</b> Today's note first; the week sits quietly underneath. A missing day is a hollow dot, never a broken streak.", html: home },
-              { label: "<b>First run.</b> One action, no tour. The promise is in the copy: nothing counts or scores.", tag: "Empty", html: firstRun },
-              { label: "<b>Writing.</b> Free text leads; tags are optional and never block saving.", html: writing },
-              { label: "<b>Saved.</b> A calm confirmation with the edit window spelled out — no confetti.", html: saved },
+              { name: "Today", label: "Today's note first; the week sits quietly underneath. A missing day is a hollow dot, never a broken streak.", html: home },
+              { name: "Today", label: "Punch-hole status bar, gesture handle; the tab bar keeps Fieldnote's own style on both platforms.", tag: "Android", tagAccent: true, html: androidHome },
+              { name: "Today", label: "Roles scale together; the hierarchy survives.", tag: "Large text", html: axHome },
+              { name: "Today, first run", label: "One action, no tour. The promise is in the copy: nothing counts or scores.", html: firstRun },
+              { name: "Writing", label: "Free text leads; tags are optional and never block saving.", html: writing },
+              { name: "Writing", label: "Back is an arrow and system back saves a draft — never discards.", tag: "Android", tagAccent: true, html: androidWriting },
+              { name: "Writing, saved", label: "A calm confirmation with the edit window spelled out — no confetti.", html: saved },
             ],
             notes: [
               note("Why no streaks", "Streaks turn a reflective habit into an obligation; a missed day then feels like failure. The week view shows presence, not performance."),
               note("Footer CTA", "Screens with one obvious next step pin it in the footer so the scroll region never hides the main action."),
+              note("Back saves a draft", "System back is always available on Android. Losing a half-written note to a gesture would break the product's one promise, so back keeps a draft."),
             ],
           },
           {
@@ -542,8 +546,8 @@
             title: "Weekly look-back",
             desc: "Sunday evening, a short reflection on the week — what came up, and one line worth rereading.",
             cols: [
-              { label: "<b>A full week.</b> Patterns in plain words; one quoted line in the display serif.", html: lookBack },
-              { label: "<b>A quiet week.</b> One note is still a week. No nudge, no guilt.", tag: "Edge", html: quietWeek },
+              { name: "Week, full", label: "Patterns in plain words; one quoted line in the display serif.", html: lookBack },
+              { name: "Week, one note", label: "One note is still a week. No nudge, no guilt.", html: quietWeek },
             ],
             notes: [note("Plain-language patterns", "“Walks showed up on four of five notes” instead of a chart: the audience journals to notice, not to analyze.")],
           },
@@ -552,9 +556,9 @@
             title: "Privacy and deletion",
             desc: "Notes are personal. The app says where they live and makes destructive actions deliberate.",
             cols: [
-              { label: "<b>Locked.</b> States where notes live before asking for Face ID.", html: locked },
-              { label: "<b>Privacy settings.</b> Each toggle explains its consequence in one line.", html: privacy },
-              { label: "<b>Delete confirm.</b> Sheet over the note; consequence in the title, the safe choice equally easy.", tag: "Destructive", html: deleteSheet },
+              { name: "Locked", label: "States where notes live before asking for Face ID.", html: locked },
+              { name: "Privacy settings", label: "Each toggle explains its consequence in one line.", html: privacy },
+              { name: "Note, delete confirm", label: "Sheet over the note; consequence in the title, the safe choice equally easy.", html: deleteSheet },
             ],
           },
           {
@@ -562,21 +566,10 @@
             title: "Errors and edge content",
             desc: "Offline, nothing found, and a note far longer than the happy path assumed.",
             cols: [
-              { label: "<b>Offline.</b> Reassure first: the note is saved. Sync is secondary.", tag: "Error", html: offline },
-              { label: "<b>No results.</b> Say what was searched and suggest the next try.", tag: "Empty", html: noResults },
-              { label: "<b>Long note.</b> Five tags wrap; the card grows, nothing truncates.", tag: "Edge", html: longEntry },
-              { label: "<b>Largest text size.</b> Roles scale together; the hierarchy survives.", tag: "AX size", html: axHome },
+              { name: "Today, offline", label: "Reassure first: the note is saved. Sync is secondary.", html: offline },
+              { name: "Search, no results", label: "Say what was searched and suggest the next try.", html: noResults },
+              { name: "Today, long note", label: "Five tags wrap; the card grows, nothing truncates.", html: longEntry },
             ],
-          },
-          {
-            id: "android",
-            title: "Android differences",
-            desc: "The flow is shared; only the chrome changes. Android columns appear only where the platforms differ.",
-            cols: [
-              { label: "<b>Today, Android.</b> Punch-hole status bar, gesture handle; the tab bar keeps Fieldnote's own style on both platforms.", tag: "Android", tagAccent: true, html: androidHome },
-              { label: "<b>Writing, Android.</b> Back is an arrow and system back saves a draft — never discards.", tag: "Android", tagAccent: true, html: androidWriting },
-            ],
-            notes: [note("Back saves a draft", "System back is always available on Android. Losing a half-written note to a gesture would break the product's one promise, so back keeps a draft.")],
           },
         ],
         pageNotes: [

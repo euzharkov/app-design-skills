@@ -1,12 +1,12 @@
-# Reviewing and iterating
+# Serving, capturing, checking
 
-A mockup you haven't looked at is a guess. Review in a real browser, as
-screenshots, the way the user will judge it.
+The canvas is plain static files, driven entirely by its URL, so every view
+can be reproduced and every capture named.
 
 ## Serving
 
-The foundations renderer reads CSS rules, which browsers block on `file://` —
-always serve over http.
+The tokens section reads CSS rules, which browsers block on `file://`.
+Always serve over http.
 
 - **Claude Code with the browser pane**: add a launch entry once and use
   `preview_start {name: "mockup"}`:
@@ -22,95 +22,83 @@ always serve over http.
   ```
 
 - **Anywhere else**: `python3 -m http.server 4680 --directory PATH/TO/mockup`
-  or `npx serve PATH/TO/mockup`. Plain static files — no build step, ever.
+  or `npx serve PATH/TO/mockup`. No build step.
 
-## Deterministic URLs
-
-The canvas is controlled entirely by URL, so every screenshot is
-reproducible and nameable:
+## URLs
 
 | URL | Shows |
 | --- | --- |
-| `/?solo=foundations` | design system + contrast audit |
-| `/?solo=<section-id>` | one flow section |
-| `/?solo=<id>&theme=dark` | same, dark |
-| `/onboarding.html?solo=…` | sections on other pages |
-| `/?zoom=100` | frames at full production size |
+| `/?solo=tokens` | the tokens section and contrast audit |
+| `/?solo=<section-id>` | one section |
+| `/?solo=<section-id>&theme=dark` | the same, dark |
+| `/settings.html?solo=<section-id>` | a section on another page |
+| `/?solo=<section-id>#<screen-id>` | one section, scrolled to one screen |
+| `/?zoom=100` | frames at production size (50, 70, 85, 100) |
 
-**Screenshot section by section via `?solo=`, not by scrolling a full page.**
-Long mockup pages freeze headless screenshots during deep scrolls; solo mode
-renders only the requested section, so captures stay fast and reliable. This
-is a lesson paid for in a real project — don't relearn it.
+Older mockups used `?solo=foundations`; it still opens the tokens section.
 
-If a sandboxed or headless browser still stalls on a page (CSS `zoom` plus
-wide horizontal rails is the usual culprit), hide every section except the
-target before capturing — `document.querySelectorAll('.sec').forEach(s =>
-s.style.display = s.id === 'TARGET' ? '' : 'none')` — or capture with
-headless Chrome directly:
+## Capturing
+
+Capture section by section through `?solo=`, never by scrolling a long page:
+deep scrolls freeze headless captures, and solo renders only what is asked.
+
+Name each capture after what it shows, from the ids:
+
+```
+<page>/<section-id>.png                    whole section, light
+<page>/<section-id>.dark.png               whole section, dark
+<page>/<section-id>--<screen>.png          one screen
+```
+
+One screen alone: capture the element `#<screen-id> .screen` (the frame's
+content box) or crop the section capture to that column.
+
+Headless Chrome, when the browser pane is unavailable or stalls:
 
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --window-size=1600,1200 --hide-scrollbars --virtual-time-budget=8000 \
-  --screenshot=out.png "http://localhost:4680/?solo=SECTION&theme=dark"
+  --screenshot=out.png "http://localhost:4680/?solo=SECTION&theme=dark&zoom=100"
 ```
 
-`--virtual-time-budget` gives webfonts and icon scripts time to load before
-the capture.
+`--virtual-time-budget` gives webfonts and icon scripts time to load. If a
+browser still stalls (CSS `zoom` on wide rails is the usual cause), hide the
+other sections before capturing:
+`document.querySelectorAll('.sec').forEach(s => s.style.display = s.id === 'TARGET' ? '' : 'none')`.
 
-## The review loop
+## Checking the canvas
 
-After each meaningful chunk (a section, a new page):
+After each change, check the canvas, not the design. Screen content is the
+person's; these are the things the skill is responsible for:
 
-1. Reload and check the browser console — template-literal typos surface as
-   errors, not blank screens you'd misread as style choices.
-2. Screenshot each new section via `?solo=`, light and dark.
-3. Critique against the checklist below. Fix in source, not in your head.
-4. Re-screenshot, then show the user the good candidates with one line per
-   screenshot on what to look at.
+1. **Console** is clean. An unclosed backtick in a template literal blanks
+   the whole page; it is not a style choice.
+2. **Grouping**: each section is one flow, columns in the order the user
+   meets them, one frame per column.
+3. **Names**: every new column has a `name` in the product's words, unique
+   in its section (twins excepted); section ids are kebab-case and
+   unchanged from before.
+4. **Tags**: platform tags on every column off the page's primary
+   platform, spelled exactly as in canvas.md; states in names, not tags.
+5. **Frames**: right platform chrome; nothing clipped by the frame unless
+   the clip is the point; nothing product-shaped outside a frame.
+6. **Tokens**: no raw colors or sizes inside screens; the tokens section has
+   no `unresolved` rows; dark captures actually show dark values.
+7. **Labels and notes** fit under their frame at 70% and 100% zoom, and
+   notes state decisions, not filler.
 
-### Self-critique checklist
-
-Work through it honestly — screens that "look done" on first render rarely
-survive all seven:
-
-1. **Hierarchy** — squint (or blur mentally): does the most important thing
-   read first? Is there exactly one primary action per screen?
-2. **Rhythm** — spacing on the 4px scale, aligned to a consistent inset; no
-   accidental 13px gaps, no crowding at card edges.
-3. **Type honesty** — every text node has a role class; no browser-default
-   sizes leaking; no role metrics overridden to force a fit.
-4. **Contrast** — audit green; secondary text still legible on tinted fills;
-   dark theme checked, not assumed.
-5. **Targets** — interactive things at the platform minimum (44pt iOS,
-   48dp Android; pointer targets on desktop), spaced enough to miss-proof.
-   Desktop adds hover, focus ring, and keyboard paths.
-6. **States** — does the section show empty/error/edge, or only the happy
-   path? (See the states discipline in screens.md.)
-7. **Copy** — real words, product voice, data that makes sense together.
-
-### Reviewing with the user
-
-Present 2–4 screenshots at a time with a specific question ("Is the empty
-state too playful for this audience?"), not "thoughts?". When the user gives
-a direction ("warmer", "less dense"), change the ROLE values in
-`design-system.css` first and re-screenshot — one edit restyles every screen,
-which is the entire argument for the token layer. Only if the note is about
-one screen does the fix belong in that screen's CSS.
-
-Record the outcome of real decisions as section notes in the page — the
-mockup is the design memory, not the chat transcript.
+Then show the person the captures, two to four at a time, each with its
+screen id, and ask about what they asked for. Don't attach a critique of
+the screen content unless they asked for one.
 
 ## When something looks wrong
 
-Debug in this order: (1) console errors — an unclosed backtick kills a whole
-page render; (2) inspect the element — is it consuming the var you think it
-is, or a raw value; (3) check the screen in isolation with `?solo=` before
-blaming the canvas; (4) only then adjust CSS. Resist fixing a symptom with an
-inline style — find which layer owns the mistake.
+Work from the outside in: (1) console errors; (2) the element inspector: is
+the screen using the token you think, or a raw value; (3) the section alone
+with `?solo=`; (4) only then CSS. Don't patch with inline styles; find which
+layer owns the mistake (tokens, screen, canvas, frame).
 
-One silent killer to know: writing `*/` inside a CSS comment (easy to do in
-prose like `--font-*/--weight-*`) terminates the comment early, and the
-leftover text swallows the next rule — with no console error. The symptom is
-the foundations page suddenly reporting unresolved values or system fonts;
-the fix is rewording the comment. The audit exists to catch exactly this
-class of quiet breakage.
+`*/` inside a CSS comment (easy to write in prose like `--font-*/--weight-*`)
+ends the comment early and the leftover text swallows the next rule, with
+no console error. The symptom is the tokens section suddenly showing
+unresolved values or system fonts; the fix is rewording the comment.

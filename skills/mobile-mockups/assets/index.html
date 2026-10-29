@@ -4,27 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mockups</title>
-    <!-- Webfonts: add a <link> here when the design system chooses one, and
-         point --font-display / --font-body at it in design-system.css.
+    <!-- Webfonts: add the product's font <link> here and point
+         --font-display / --font-body at it in tokens.css.
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=…&display=swap" rel="stylesheet" />
     -->
-    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="phone.css" />
-    <!-- Icon library: the PROJECT'S choice, asked during discovery — never
-         assumed. The starter example happens to use Phosphor; swap this tag
-         (and the page-local icon() shorthand below) for whatever the user
-         picks, or delete it and use emoji/inline SVG. -->
+    <!-- Icon library: the product's, asked at setup. The starter example
+         uses Phosphor; swap this tag (and the page-local icon() shorthand
+         below) for the product's library, or delete it. -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
-      /* =====================================================================
-         Layer 2: screen CSS for THIS page. Composition and positioning live
-         here; every color, size, radius, and space comes from design-system
-         values. Classes below are presentation hooks for these mockups, not
-         a component API — production is free to structure things its own way.
-         ===================================================================== */
+      /* Screen CSS for this page. Every color, size, radius and space comes
+         from tokens.css. These classes are presentation hooks for these
+         mockups, not a component API production has to mirror. */
 
       .stack > * + * {
         margin-top: var(--space-3);
@@ -132,12 +128,10 @@
     <script src="mockup-core.js"></script>
     <script src="phone.js"></script>
     <script>
-      /* ===================================================================
-         The example below mocks "Fieldnote", a tiny journaling app, purely
-         to demonstrate the method. Replace the sections with your product's
-         flows and delete the example. Keep the foundations section and the
-         contrast pairs in sync with your design system.
-         =================================================================== */
+      /* The example section mocks "Fieldnote", a tiny journaling app, only
+         to show how a section is declared: named columns, a tag, a note.
+         Replace it with the product's sections. Keep contrastPairs in sync
+         with tokens.css. */
 
       /* Page-local icon shorthand for the library this project chose.
          tabbar() accepts rendered HTML, so any library (or emoji) works. */
@@ -233,7 +227,7 @@
       renderMockupPage({
         title: "Fieldnote — example mockup",
         intro:
-          "A starter canvas for the HTML mockup method. The Foundations section below renders live from design-system.css; the example flow shows how screens are declared. Replace the example with your product and keep foundations honest.",
+          "A starter canvas. The tokens section renders live from tokens.css; the example section shows how screens are grouped, named and tagged. Replace the example with the product's sections.",
         contrastPairs: [
           ["--ink-900", "--canvas"],
           ["--ink-900", "--card"],
@@ -251,40 +245,21 @@
         ],
         sections: [
           {
-            id: "core-flow",
-            title: "Core flow — example, delete me",
-            desc: "The daily loop: read today, notice the week, add a note. Every screen shows real copy — the mockup doubles as the copy spec.",
+            id: "daily-loop",
+            title: "Daily loop (example, delete me)",
+            desc: "From opening the app to a saved note.",
             cols: [
-              {
-                label: "<b>Home.</b> Today first, history second — the week list stays quiet below the fold.",
-                html: homeScreen,
-              },
-              {
-                label: "<b>First run.</b> One action, no feature tour. Empty states carry the product's voice.",
-                tag: "Empty state",
-                html: emptyScreen,
-              },
-              {
-                label: "<b>New entry.</b> Free text leads; tags are optional and never block saving.",
-                html: newEntryScreen,
-              },
+              { name: "Today", html: homeScreen },
+              { name: "Today, empty", label: "What a new user sees first.", html: emptyScreen },
+              { name: "New note", html: newEntryScreen },
             ],
-            notes: [
-              note(
-                "Why tags don't gate saving",
-                "The primary promise is a one-sentence note. A required taxonomy would turn reflection into data entry, so tags stay a bonus.",
-              ),
-              note(
-                "Footer CTA pattern",
-                "Screens with one obvious next step pin it in the footer; the scroll region never hides the main action.",
-              ),
-            ],
+            notes: [note("Tags are optional", "Decided: saving never requires a tag.")],
           },
         ],
         pageNotes: [
           note(
             "How to read this page",
-            "Each section is a flow; each phone is a state, labeled underneath. Rationale sits in notes like this one so decisions survive the session that made them.",
+            "Each section is a flow; each phone is one screen state, named underneath. Screen ids (daily-loop--today-empty) address a single screen in links and captures.",
           ),
         ],
       });

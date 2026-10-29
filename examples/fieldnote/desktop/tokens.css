@@ -1,0 +1,179 @@
+/*
+ * tokens.css — Fieldnote desktop (example product).
+ *
+ * Fieldnote is a fictional private journal: one honest sentence a day, a
+ * quiet weekly look-back, no streaks.
+ *
+ * Sibling mockup: the color tokens below (light and dark) are copied
+ * verbatim from ../mobile/tokens.css. Type roles, radii and insets are set
+ * for desktop here. A color changes in the mobile file first and is copied
+ * here.
+ *
+ * Built with the desktop-mockups skill.
+ *
+ * Conventions the tokens section relies on:
+ *   - colors:   any custom property whose value is a color shows as a swatch
+ *   - fonts:    --font-NAME (families), --weight-NAME (loaded weights)
+ *   - spacing:  --space-N
+ *   - shape:    --radius-NAME
+ *   - type:     .t-ROLE classes render as type role samples
+ */
+
+:root {
+  /* ---- Color tokens (light) ---- */
+  --canvas: #f5f1ea;
+  --card: #fffdf9;
+  --functional: #faf7f1;
+  --selected: #e6e9df;
+  --accent-tint: #e8f0ea;
+
+  /* Text: primary, secondary, tertiary. */
+  --ink-900: #1d2420;
+  --ink-600: #48524c;
+  --ink-400: #636c66;
+
+  /* Accent: interactive (text and controls) and decorative (fills). */
+  --accent-interactive: #2e6a52;
+  --accent-decorative: #8cbca2;
+
+  --danger: #a4463b;
+
+  --border-subtle: #e6e0d5;
+  --border-control: #c9c2b4;
+
+  --btn-fill: #2e6a52;
+  --btn-label: #fbfaf5;
+
+  /* ---- Font families ---- */
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-body: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+
+  /* Weights the product loads. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ---- Spacing ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ---- Radii ---- */
+  --radius-small: 6px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  /* Horizontal inset of window content; sheets and popovers share it. */
+  --screen-inset: 20px;
+}
+
+/* ---- Type roles ----
+   One class per role; each sets family, weight, size, line height, tracking
+   and default color together. Sizes are production units at the frame's
+   baseline, 1:1. */
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 28px;
+  line-height: 34px;
+  letter-spacing: -0.3px;
+  color: var(--ink-900);
+}
+.t-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 21px;
+  line-height: 27px;
+  letter-spacing: -0.1px;
+  color: var(--ink-900);
+}
+.t-heading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ink-900);
+}
+.t-subheading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--ink-900);
+}
+.t-body-lg {
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--ink-900);
+}
+.t-body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-900);
+}
+.t-callout {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-600);
+}
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+  color: var(--ink-600);
+}
+.t-link {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--accent-interactive);
+}
+.t-on-accent {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--btn-label);
+}
+
+/* ---- Dark ----
+   Color tokens only, scoped to screens so the canvas stays light. */
+.theme-dark .screen,
+.screen.night {
+  --canvas: #111111;
+  --card: #1c1c1c;
+  --functional: #171717;
+  --selected: #2b2b2b;
+  --accent-tint: #18261f;
+
+  --ink-900: #f2f2f2;
+  --ink-600: #b4b4b4;
+  --ink-400: #8a8a8a;
+
+  --accent-interactive: #4cc38a;
+  --accent-decorative: #1f7a50;
+
+  --danger: #ff6b5e;
+
+  --border-subtle: #2a2a2a;
+  --border-control: #474747;
+
+  --btn-fill: #4cc38a;
+  --btn-label: #0b130f;
+}

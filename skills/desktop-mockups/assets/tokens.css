@@ -1,0 +1,189 @@
+/*
+ * tokens.css — the product's values, in the structure the canvas reads.
+ *
+ * The VALUES are the product's: import them from the production theme, copy
+ * them from a sibling mockup, or enter what the team gives you. The ones
+ * below are neutral placeholders so the canvas renders on day one; they are
+ * not a recommendation. The STRUCTURE is the part to keep.
+ *
+ * Sibling mockup: if the product has a mobile mockup directory, copy its
+ * color tokens (light and dark) here verbatim, under the same names. Type
+ * roles, spacing, radii and insets are set for desktop here.
+ *
+ * Flat on purpose: a token holds a value, not a reference to another token,
+ * and there are no component tokens (no --button-bg). Screens compose these
+ * values directly in page-local CSS.
+ *
+ * Conventions the tokens section relies on (keep them when renaming):
+ *   - colors:   any custom property whose value is a color shows as a swatch
+ *   - fonts:    --font-* (families), --weight-* (loaded weights)
+ *   - spacing:  --space-*
+ *   - shape:    --radius-*
+ *   - type:     .t-<role> classes render as type role samples
+ */
+
+:root {
+  /* ---- Color tokens (light) ----
+     Named by role, not appearance; rename to the production names when
+     importing a theme. */
+  --canvas: #f4f2ee;
+  --card: #ffffff;
+  --functional: #faf9f6;
+  --selected: #e9e7e0;
+  --accent-tint: #eef0fa;
+
+  /* Text: primary, secondary, tertiary. */
+  --ink-900: #1f2126;
+  --ink-600: #4b4e57;
+  --ink-400: #646873;
+
+  /* Accent: interactive (text and controls) and decorative (fills). */
+  --accent-interactive: #4653c8;
+  --accent-decorative: #7c88e8;
+
+  --danger: #a8433a;
+
+  --border-subtle: #e4e2db;
+  --border-control: #c6c4bc;
+
+  --btn-fill: #1f2126;
+  --btn-label: #f8f8f6;
+
+  /* ---- Font families ----
+     Webfonts load from each page <head>; point these at them. */
+  --font-display: -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --font-body: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+
+  /* Weights the product loads. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ---- Spacing ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ---- Radii ---- */
+  --radius-small: 6px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  /* Horizontal inset of window content (sheets and panels use it too). */
+  --screen-inset: 20px;
+}
+
+/* ---- Type roles ----
+   One class per role; each sets family, weight, size, line height, tracking
+   and default color together. Sizes are production points at the window's
+   declared size (mockup px = pt, 1:1). The role names match the mobile
+   starter so a sibling mobile mockup maps role for role. */
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 26px;
+  line-height: 32px;
+  letter-spacing: -0.3px;
+  color: var(--ink-900);
+}
+.t-title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 20px;
+  line-height: 26px;
+  letter-spacing: -0.2px;
+  color: var(--ink-900);
+}
+.t-heading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ink-900);
+}
+.t-subheading {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--ink-900);
+}
+.t-body-lg {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-900);
+}
+.t-body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-900);
+}
+.t-callout {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-600);
+}
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+  color: var(--ink-600);
+}
+.t-link {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--accent-interactive);
+}
+.t-on-accent {
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--btn-label);
+}
+
+/* ---- Dark ----
+   Color tokens only, scoped to screens so the canvas stays light.
+   .theme-dark on <body> (toolbar, ?theme=dark) flips every frame;
+   .screen.night forces one frame dark. Delete the block for a light-only
+   product. */
+.theme-dark .screen,
+.screen.night {
+  --canvas: #17181c;
+  --card: #22242b;
+  --functional: #1d1f24;
+  --selected: #2d3039;
+  --accent-tint: #262a3d;
+
+  --ink-900: #ecedef;
+  --ink-600: #b6b8bf;
+  --ink-400: #8a8d97;
+
+  --accent-interactive: #97a2f0;
+  --accent-decorative: #4653c8;
+
+  --danger: #d3766b;
+
+  --border-subtle: #2e3037;
+  --border-control: #454854;
+
+  --btn-fill: #ecedef;
+  --btn-label: #17181c;
+}

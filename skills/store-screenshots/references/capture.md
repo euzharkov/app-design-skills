@@ -66,8 +66,8 @@ size changed without updating the size table.
 A blank, half-loaded or error-page capture still has the right
 dimensions. Open several PNGs and look. Then: check the URL in a normal
 browser; check the console (a template-literal typo blanks the whole
-page); for `file://` capture, check relative paths (`../mobile/design-
-system.css` resolves against the page, not the shell's cwd). Set
+page); for `file://` capture, check relative paths (`../mobile/tokens.css`
+resolves against the page, not the shell's cwd). Set
 `STORE_PAGE=http://localhost:PORT/store.html` to capture over http.
 
 ## Transparency rejected by the store
@@ -79,7 +79,8 @@ with `-alpha remove`.
 
 ## Dark set
 
-`&theme=dark` works on every export URL. For a separate dark set, run the
-capture loop again with the param into a sibling folder — stores don't have
-a dark slot, so pick one set per listing; the night frame mid-rail usually
-does the job.
+`&theme=dark` works on every export URL. `export.sh` captures the light set
+only; for a dark set, run the same captures with `&theme=dark` appended to
+each URL, into a sibling folder.
+Stores have no dark slot; which set ships is the person's call. A single
+frame forced dark in both themes is `night: true` on that frame.

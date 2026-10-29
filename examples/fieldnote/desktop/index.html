@@ -7,19 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="window.css" />
     <!-- Icons: Phosphor regular, the same library as the mobile sibling, so
          a symbol means the same thing on both. Production on macOS maps each
-         to its closest SF Symbol (table in DESIGN-SYSTEM.md). -->
+         to its closest SF Symbol. -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
-      /* =====================================================================
-         Layer 2: screen CSS for this page. Every color, size, radius, and
-         space comes from design-system values.
-         ===================================================================== */
+      /* Screen CSS for this page. Every color, size, radius and space comes
+         from tokens.css. */
 
       /* Window surfaces: the sidebar sits on the paper canvas, the list on
          the quieter functional surface, the entry itself on the card — the
@@ -310,7 +308,7 @@
       /* ===================================================================
          Fieldnote — desktop. A fictional private journal: one honest
          sentence a day, tags, a quiet weekly look-back, no streaks.
-         Mobile sibling: ../mobile/ (color roles shared verbatim).
+         Mobile sibling: ../mobile/ (color tokens shared verbatim).
          =================================================================== */
 
       const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
@@ -716,7 +714,7 @@
       renderMockupPage({
         title: "Fieldnote — desktop",
         intro:
-          "Desktop surfaces for Fieldnote, a private journal: one honest sentence a day, tags, a quiet weekly look-back, no streaks. macOS first, with a Windows 11 variant at the end. Color roles are shared verbatim with the <a href='../mobile/'>mobile mockups</a>; type is re-derived for desktop.",
+          "Desktop surfaces for Fieldnote, a private journal: one honest sentence a day, tags, a quiet weekly look-back, no streaks. macOS first, with a Windows 11 variant at the end. Color tokens are copied verbatim from the <a href='../mobile/'>mobile mockups</a>; type roles are set for desktop.",
         defaultZoom: 70,
         contrastPairs: [
           ["--ink-900", "--canvas"],
@@ -745,10 +743,10 @@
             title: "Menu-bar quick note",
             desc: "The daily habit lives in the menu bar: one shortcut, one sentence, gone again. The popover is as tall as its content and never grows a toolbar.",
             cols: [
-              { label: "<b>Empty.</b> Opens with the cursor in the field. Save is disabled until there's a word to save.", html: qnEmpty },
-              { label: "<b>Typing.</b> Save becomes the default button: Return saves, Esc closes. Tags are optional and one click each.", html: qnTyping },
-              { label: "<b>Saved.</b> The sentence is read back once, in the reading face, then the popover closes itself.", html: qnSaved },
-              { label: "<b>Already written today.</b> Shows today's note instead of an empty field. Adding is offered; replacing never is.", tag: "Edge", html: qnAlready },
+              { name: "Quick note, empty", label: "Opens with the cursor in the field. Save is disabled until there's a word to save.", html: qnEmpty },
+              { name: "Quick note, typing", label: "Save becomes the default button: Return saves, Esc closes. Tags are optional and one click each.", html: qnTyping },
+              { name: "Quick note, saved", label: "The sentence is read back once, in the reading face, then the popover closes itself.", html: qnSaved },
+              { name: "Quick note, already written today", label: "Shows today's note instead of an empty field. Adding is offered; replacing never is.", html: qnAlready },
             ],
             notes: [
               note("No counters in the popover", "No streak, no character count, no “3 days in a row”. The popover asks one question and stays out of the way; counting belongs nowhere in this product."),
@@ -761,9 +759,9 @@
             title: "Main window",
             desc: "Where notes are reread. Sidebar for time and tags, a list of the week, and the note itself on the brightest surface, set in the serif.",
             cols: [
-              { label: "<b>Reading a note.</b> Today's note is selected on open. The entry text is the only serif on screen besides titles.", html: journal(readingWed) },
-              { label: "<b>Weekly look-back.</b> A finished week reads as one column: tag counts from the week, then every sentence. No grades, no trends.", html: lookBack },
-              { label: "<b>First run.</b> One action, plus the shortcut that makes the habit possible. No tour.", tag: "Empty state", html: firstRun },
+              { name: "Journal, reading a note", label: "Today's note is selected on open. The entry text is the only serif on screen besides titles.", html: journal(readingWed) },
+              { name: "Journal, weekly look-back", label: "A finished week reads as one column: tag counts from the week, then every sentence. No grades, no trends.", html: lookBack },
+              { name: "Journal, first run", label: "One action, plus the shortcut that makes the habit possible. No tour.", html: firstRun },
             ],
             notes: [
               note("Three surfaces, three jobs", "Sidebar on canvas, list on functional, note on card. The note being read is always the lightest thing in the window, in both themes."),
@@ -776,9 +774,9 @@
             title: "Menus and shortcuts",
             desc: "Every command lives in a menu with its shortcut shown; toolbar items repeat the shortcut in their tooltip. Context menus mirror the menu bar wording exactly.",
             cols: [
-              { label: "<b>File menu.</b> The quick-note shortcut is discoverable here, not only in Settings.", html: fileMenu },
-              { label: "<b>Context menu on a list row.</b> Hover tints the row; Delete sits last, behind a separator, in danger ink.", html: contextMenu },
-              { label: "<b>Toolbar hover.</b> The tooltip names the action and its shortcut. Toolbar items never have labels-only-on-hover.", html: toolbarTip },
+              { name: "File menu", label: "The quick-note shortcut is discoverable here, not only in Settings.", html: fileMenu },
+              { name: "Context menu, list row", label: "Hover tints the row; Delete sits last, behind a separator, in danger ink.", html: contextMenu },
+              { name: "Toolbar, hover", label: "The tooltip names the action and its shortcut. Toolbar items never have labels-only-on-hover.", html: toolbarTip },
             ],
             notes: [note("One name per action", "“Delete Note…” in the context menu, “Delete Note” on the sheet button, ⌘⌫ everywhere. The ellipsis means a confirmation follows.")],
           },
@@ -787,8 +785,8 @@
             title: "Search",
             desc: "Search lives in the toolbar and replaces the list in place. Matches are highlighted with the accent tint, never bold.",
             cols: [
-              { label: "<b>Results.</b> The count is the window subtitle; newest first.", html: searchResults },
-              { label: "<b>No results.</b> Suggests tags the person actually uses instead of a dead end.", tag: "Empty state", html: searchEmpty },
+              { name: "Search, results", label: "The count is the window subtitle; newest first.", html: searchResults },
+              { name: "Search, no results", label: "Suggests tags the person actually uses instead of a dead end.", html: searchEmpty },
             ],
             notes: [],
           },
@@ -797,8 +795,8 @@
             title: "Deleting",
             desc: "Deleting a note is recoverable for 30 days, so it gets a sheet that shows exactly what goes. Emptying Recently Deleted is not recoverable, so it gets an alert.",
             cols: [
-              { label: "<b>Delete sheet.</b> Quotes the note being deleted. Cancel is the default; Delete is in danger ink, not a red fill.", html: deleteSheet },
-              { label: "<b>Empty Recently Deleted.</b> The irreversible one: an alert with the count in the button.", html: emptyTrash },
+              { name: "Delete sheet", label: "Quotes the note being deleted. Cancel is the default; Delete is in danger ink, not a red fill.", html: deleteSheet },
+              { name: "Empty Recently Deleted", label: "The irreversible one: an alert with the count in the button.", html: emptyTrash },
             ],
             notes: [note("Why not undo instead of a sheet", "A journal entry is a memory. A toast that disappears in five seconds is too easy to miss for something people can't rewrite later.")],
           },
@@ -807,27 +805,27 @@
             title: "Settings",
             desc: "Three panes, each one screen tall. The window title is the pane name; the window is as tall as the pane.",
             cols: [
-              { label: "<b>General.</b> The shortcut leads because it is how the product is used.", html: settingsGeneral },
-              { label: "<b>Privacy.</b> Lock is on by default. The promise is written in plain words under the controls.", html: settingsPrivacy },
-              { label: "<b>Export.</b> The button says how many notes go out, from the same 42 the sidebar counts.", html: settingsExport },
-              { label: "<b>Locked.</b> What “Lock Fieldnote” looks like: no sidebar, no list, nothing to read until unlocked.", tag: "Privacy", html: locked },
+              { name: "Settings, General", label: "The shortcut leads because it is how the product is used.", html: settingsGeneral },
+              { name: "Settings, Privacy", label: "Lock is on by default. The promise is written in plain words under the controls.", html: settingsPrivacy },
+              { name: "Settings, Export", label: "The button says how many notes go out, from the same 42 the sidebar counts.", html: settingsExport },
+              { name: "Journal, locked", label: "What “Lock Fieldnote” looks like: no sidebar, no list, nothing to read until unlocked.", html: locked },
             ],
             notes: [note("Settings window size", "580 pt wide, height follows the pane. Zoom is disabled: settings are not a document."),],
           },
           {
             id: "windows",
             title: "Windows 11 variant",
-            desc: "Same roles, same copy, Windows conventions: caption buttons right, a navigation pane on the Mica base, content on a raised layer, primary dialog button first.",
+            desc: "Same tokens, same copy, Windows conventions: caption buttons right, a navigation pane on the Mica base, content on a raised layer, primary dialog button first.",
             cols: [
-              { label: "<b>Main window.</b> Command bar under the title bar; search on the right. Body text 14 px in production (Segoe UI Variable).", tag: "Windows", html: windowsMain },
-              { label: "<b>Delete dialog.</b> A content dialog: buttons in the footer band, primary first, Cancel last.", tag: "Windows", html: windowsDelete },
-              { label: "<b>Tray flyout.</b> The quick note opens above the taskbar, anchored to its tray icon.", tag: "Windows", html: windowsTray },
+              { name: "Journal, reading a note", label: "Command bar under the title bar; search on the right. Body text 14 px in production (Segoe UI Variable).", tag: "Windows", tagAccent: true, html: windowsMain },
+              { name: "Delete dialog", label: "A content dialog: buttons in the footer band, primary first, Cancel last.", tag: "Windows", tagAccent: true, html: windowsDelete },
+              { name: "Quick note, typing", label: "The quick note opens above the taskbar, anchored to its tray icon.", tag: "Windows", tagAccent: true, html: windowsTray },
             ],
             notes: [note("Shortcuts translate, copy doesn't", "Ctrl replaces ⌘ through keys(); “this Mac” becomes “this PC”. Everything else is the same sentence on both platforms.")],
           },
         ],
         pageNotes: [
-          note("How to read this page", "Each section is one window type; each frame is a state. Frames are 1:1 in points at their declared size; the zoom only changes display size."),
+          note("How to read this page", "Each section is a window or flow; each frame is one state, named underneath. Frames are 1:1 in points at their declared size; the zoom only changes display size. Screen ids (quick-note--quick-note-empty) address a single frame in links and captures."),
           note("Parity with the app", "The app's debug build renders any named state to PNG (fieldnote-debug://snapshot?state=journal.lookback). Screenshots go next to these sections at review; a state that exists in the app but not here gets a section before it ships."),
         ],
       });

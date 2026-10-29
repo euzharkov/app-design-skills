@@ -4,20 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Store screenshots</title>
-    <!-- Same <head> as the mockup's other pages: fonts, icon library, and the
-         SAME design-system.css. Store frames never get their own palette. -->
-    <link rel="stylesheet" href="design-system.css" />
+    <!-- Same <head> as the mockup's pages: fonts, icon library, and the same
+         token file (tokens.css; design-system.css in older mockups). If this
+         page lives in its own folder, point at the mockup's copy, e.g.
+         ../mobile/tokens.css. -->
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="phone.css" />
     <!-- Desktop / Mac companion: uncomment when the mockup has window.css/js. -->
     <!-- <link rel="stylesheet" href="window.css" /> -->
     <link rel="stylesheet" href="store.css" />
     <style>
-      /* ---- Layer-2 screen CSS ----
-         Copy the style rules your shots' screens need from the mockup page
-         that owns them (or link its shared screens.css). Values come from
-         design-system.css only. Store-only composition (a breakout card, a
-         per-frame glow position) also lives here. */
+      /* ---- Screen CSS ----
+         Copy the style rules the placed screens need from the mockup page
+         that owns them (or link its shared screens.css), unchanged. Frame
+         layout for this page only (a breakout card, a glow position, the
+         feature graphic's art) goes below it, using token values. */
       .demo-card {
         background: var(--card);
         border: 1px solid var(--border-subtle);
@@ -45,56 +47,56 @@
     <script src="store.js"></script>
     <script>
       /* ================= screens =================
-         Reuse the mockup's real screens: copy their template literals (and
-         page-local helpers) here verbatim, or load a shared screens.js.
-         Write each phone screen as a function of platform so the Play cut
-         swaps Android chrome automatically. Copy inside the device is the
-         product's real copy — never marketing paraphrase. */
+         Place the mockup's existing screens: copy their template literals
+         (and page-local helpers) here unchanged, or load a shared
+         screens.js. Note each one's screen id. Write each phone screen as a
+         function of platform so the Play cut gets Android chrome. */
       const demoScreen = (platform) =>
         phone(
           `<h1 class="t-title">Replace with a real screen</h1>
-           <p class="t-body" style="margin-top: var(--space-2)">Paste the mockup screen this frame proves.</p>
-           <div class="demo-card"><div class="t-subheading">A card from the product</div><div class="t-callout">Real data, real copy.</div></div>
-           <div class="demo-card"><div class="t-subheading">Another state</div><div class="t-callout">The frame crops below the story.</div></div>`,
+           <p class="t-body" style="margin-top: var(--space-2)">Paste the mockup screen for this frame.</p>
+           <div class="demo-card"><div class="t-subheading">Placeholder card</div><div class="t-callout">Copied from the mockup, unchanged.</div></div>
+           <div class="demo-card"><div class="t-subheading">Placeholder card</div><div class="t-callout">The frame crops below the copy band.</div></div>`,
           { platform },
         );
 
       /* ================= frames =================
-         Order is the story: promise → evidence → explanation. One idea per
-         frame; headline = the benefit, the device = the proof. */
+         One entry per store frame, in upload order. id + position give the
+         export name (01-hero.png). Headlines, captions and order are the
+         person's; the placeholders below are only there to show the slots. */
       renderStorePage({
         title: "Store screenshots",
         intro:
-          "Starter canvas. Replace the frames below with the product's story, then export with export.sh. Toggle Dark in the toolbar to review the dark set; the contrast audit at the bottom covers both.",
+          "Starter page. Replace the frames below with the person's shots, then export with export.sh. Toggle Dark in the toolbar to see the dark set; the contrast audit at the bottom covers both.",
         shots: [
           {
             id: "hero",
             hero: true,
-            eyebrow: "Product name",
-            headline: "The promise, in a few words",
-            caption: "One sentence of support, if the headline needs it.",
+            eyebrow: "Eyebrow",
+            headline: "Headline as given",
+            caption: "Optional caption.",
             device: demoScreen,
             scale: 0.92,
           },
           {
-            id: "evidence",
-            eyebrow: "Feature area",
-            headline: "One benefit per frame",
+            id: "second",
+            eyebrow: "Eyebrow",
+            headline: "Second headline",
             device: demoScreen,
           },
           {
             id: "night",
             night: true,
-            eyebrow: "Dark mode",
-            headline: "A night beat mid-rail",
+            eyebrow: "Eyebrow",
+            headline: "A frame forced dark",
             device: demoScreen,
-            android: { headline: "A night beat mid-rail" },
+            android: { caption: "Per-platform override for the Play cut." },
           },
         ],
         subs: [{ id: "plus-monthly", word: "Plus", tag: "Monthly" }],
         feature: {
           mark: "Product name",
-          headline: "The promise, in a few words",
+          headline: "Headline as given",
           art: `<div class="demo-art"></div>`,
         },
         mac: [
