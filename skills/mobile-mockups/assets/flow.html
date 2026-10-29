@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flow</title>
-    <!-- Keep the head identical to index.html (fonts, icons, both stylesheets)
-         so every page shares one design system. -->
-    <link rel="stylesheet" href="design-system.css" />
+    <!-- Keep the head identical to index.html (fonts, icons, stylesheets)
+         so every page reads the same tokens. -->
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="phone.css" />
-    <!-- Swap for the icon library chosen during discovery (see DESIGN-SYSTEM.md). -->
+    <!-- The product's icon library (see MOCKUP.md). -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
-      /* Layer 2: screen CSS for this page only. Compose freely, but take
-         every color, size, radius, and space from design-system values. */
+      /* Screen CSS for this page only. Take every color, size, radius and
+         space from tokens.css. */
     </style>
   </head>
 
@@ -27,7 +27,7 @@
       renderMockupPage({
         title: "PRODUCT — FLOW AREA",
         intro: "What this page covers and how it relates to the other pages. Link siblings: <a href='index.html'>index</a>.",
-        /* Flow pages usually skip the foundations section — it lives on index.html. */
+        /* The tokens section lives on index.html only. */
         foundations: false,
         sections: [
           {
@@ -36,8 +36,8 @@
             desc: "What this moment in the product is for.",
             cols: [
               {
-                label: "<b>State.</b> What this phone shows and why.",
-                html: phone(`<h2 class="t-title">First screen</h2>`),
+                name: "Screen name, state",
+                html: phone(`<h2 class="t-title">Screen name</h2>`),
               },
             ],
             notes: [],

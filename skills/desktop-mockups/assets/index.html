@@ -4,29 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mockups</title>
-    <!-- Webfonts: add a <link> here when the design system chooses one, and
-         point --font-display / --font-body at it in design-system.css.
+    <!-- Webfonts: add the product's font <link> here and point
+         --font-display / --font-body at it in tokens.css.
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=…&display=swap" rel="stylesheet" />
     -->
-    <link rel="stylesheet" href="design-system.css" />
+    <link rel="stylesheet" href="tokens.css" />
     <link rel="stylesheet" href="mockup-core.css" />
     <link rel="stylesheet" href="window.css" />
-    <!-- Icon library: the PROJECT'S choice, asked during discovery — never
-         assumed. On macOS the honest default is SF Symbols (mocked via a
-         generated mask-image CSS file or inline SVG, see
-         references/platforms/macos.md); on Windows, Segoe Fluent Icons. The
-         starter example uses Phosphor only so it renders anywhere; swap this
-         tag and the page-local icon() shorthand below. -->
+    <!-- Icon library: the product's, asked at setup. The starter example
+         uses Phosphor; swap this tag (and the page-local icon() shorthand
+         below) for the product's library, or delete it. -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <style>
-      /* =====================================================================
-         Layer 2: screen CSS for THIS page. Composition and positioning live
-         here; every color, size, radius, and space comes from design-system
-         values. Classes below are presentation hooks for these mockups, not
-         a component API — production is free to structure things its own way.
-         ===================================================================== */
+      /* Screen CSS for this page. Every color, size, radius and space comes
+         from tokens.css. These classes are presentation hooks for these
+         mockups, not a component API production has to mirror. */
 
       .stack > * + * {
         margin-top: var(--space-3);
@@ -104,14 +98,12 @@
     <script src="mockup-core.js"></script>
     <script src="window.js"></script>
     <script>
-      /* ===================================================================
-         The example below mocks "Fieldnote", a tiny journaling app, purely
-         to demonstrate the method. Replace the sections with your product's
-         windows and delete the example. Keep the foundations section and
-         the contrast pairs in sync with your design system.
+      /* The example section mocks "Fieldnote", a tiny journaling app, only
+         to show how a section is declared: named columns, declared window
+         sizes, a note. Replace it with the product's sections. Keep
+         contrastPairs in sync with tokens.css.
 
-         WINDOW_PLATFORM = "windows" here would switch every frame below.
-         =================================================================== */
+         WINDOW_PLATFORM = "windows" here would switch every frame below. */
 
       /* Page-local icon shorthand for the library this project chose. */
       const icon = (name, fill = false) => `<i class="ph${fill ? "-fill" : ""} ph-${name}"></i>`;
@@ -171,9 +163,9 @@
       );
 
       renderMockupPage({
-        title: "Fieldnote — example desktop mockup",
+        title: "Fieldnote — example mockup",
         intro:
-          "A starter canvas for the HTML mockup method, desktop edition. Foundations render live from design-system.css; the example shows a menu-bar popover and a main window. Replace the example with your product and keep foundations honest.",
+          "A starter canvas, macOS. The tokens section renders live from tokens.css; the example section shows how windows are grouped, named and sized. Replace the example with the product's sections.",
         defaultZoom: 70,
         contrastPairs: [
           ["--ink-900", "--canvas"],
@@ -195,21 +187,18 @@
         sections: [
           {
             id: "example",
-            title: "Quick note and main window — example, delete me",
-            desc: "One section per window type; one column per state. The popover is the daily habit, the window is where notes are reread.",
+            title: "Quick note and journal (example, delete me)",
+            desc: "From the menu bar to a saved note, and where notes are reread.",
             cols: [
-              { label: "<b>Popover, empty.</b> Opens from the menu bar with the field focused. Save stays disabled until there is text.", html: quickNote(false) },
-              { label: "<b>Popover, typing.</b> Save becomes the default button: Return saves, Esc closes.", html: quickNote(true) },
-              { label: "<b>Main window.</b> Sidebar groups by time and tag; list and detail share the content column.", html: mainWindow },
+              { name: "Quick note, empty", html: quickNote(false) },
+              { name: "Quick note, typing", html: quickNote(true) },
+              { name: "Journal", html: mainWindow },
             ],
-            notes: [
-              note("Why a popover, not a window", "Writing one sentence should not need a window to manage. The popover opens from anywhere and closes itself after saving."),
-              note("Min size is part of the design", "760 × 480 keeps the list and a readable detail column side by side. Below that the layout would need a different arrangement, so the window refuses to shrink further."),
-            ],
+            notes: [note("Minimum size", "Decided: the journal window does not shrink below 760 × 480.")],
           },
         ],
         pageNotes: [
-          note("How to read this page", "Each section is a window type; each frame is a state, labeled underneath. Frames are authored 1:1 in points at their declared size — the zoom only changes display size."),
+          note("How to read this page", "Each section is a flow or a window; each frame is one state, named underneath. Frames are drawn 1:1 in points at their declared size; the zoom only changes display size. Screen ids (example--quick-note-empty) address a single frame in links and captures."),
         ],
       });
     </script>

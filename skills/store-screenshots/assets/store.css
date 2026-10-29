@@ -1,11 +1,11 @@
 /*
  * store.css — store-listing frames for the mockup workbench.
  *
- * Load after design-system.css, mockup-core.css and the device frame files
+ * Load after tokens.css, mockup-core.css and the device frame files
  * (phone.css, window.css). Every product color, family and radius comes from
- * design-system.css roles: a store frame is the product's own surface, not a
- * new art direction. The var() fallbacks only exist so the starter renders
- * before a design system is linked.
+ * tokens.css (design-system.css in older mockups), the same file the mockup
+ * pages use. The var() fallbacks only exist so the starter renders before a
+ * token file is linked.
  *
  * Authoring sizes (the export multiplies by an integer scale, then resamples
  * to the exact store size — never shrink the capture window instead):
@@ -16,7 +16,7 @@
  *   .featshot       512×250   Play feature      ×2 → 1024×500
  *   .macshot        1440×900  Mac 16:10         ×2 → 2880×1800
  *
- * Each frame also carries the class "screen", so design-system.css's dark
+ * Each frame also carries the class "screen", so tokens.css's dark
  * block (.theme-dark .screen, .screen.night) re-resolves the roles on the
  * frame itself: a night shot darkens its background, its copy AND the device
  * inside it (the device's screen inherits the frame's values).
@@ -97,9 +97,9 @@
   color: var(--accent-interactive, #3d4fa8);
   margin-bottom: 14px;
 }
-/* Marketing headline: the display family at poster size. These sizes are
-   deliberately outside the product's type ramp — a store frame is read as a
-   thumbnail — but the family, weight and color are the product's roles. */
+/* Headline: the display family at a fixed frame size, outside the product's
+   type ramp because the frame has a fixed copy band; family, weight and
+   color come from tokens. */
 .store-headline {
   font-family: var(--font-display, var(--font-body, system-ui, sans-serif));
   font-weight: var(--weight-semibold, 600);
@@ -157,7 +157,7 @@
   transform-origin: top center;
   height: max-content;
 }
-/* Fallback so the starter's device reads before design-system.css exists. */
+/* Fallback so the starter's device reads before tokens.css is linked. */
 .shot .phone > .screen {
   background-color: var(--canvas, #f4f2ee);
   color: var(--ink-900, #1f2023);
@@ -293,9 +293,9 @@
 
 /* ================= Play feature graphic ================= */
 
-/* 1024×500, authored at 512×250. Play crops it and may lay a play button
-   over the center: keep the promise in the left half and inside a 24px safe
-   inset; no device screenshots, no small text. */
+/* 1024×500, authored at 512×250. Some Play surfaces crop it and lay a play
+   button over the center; the copy block sits in the left half inside a
+   24px inset. */
 .featshot {
   width: 512px;
   height: 250px;

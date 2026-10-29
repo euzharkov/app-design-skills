@@ -1,22 +1,22 @@
 {
-  "skill_name": "mobile-mockups-skill",
+  "skill_name": "mobile-mockups",
   "evals": [
     {
       "id": 1,
-      "prompt": "I'm building a small recipe-box app for home cooks (working name 'Ladle'). Before I write any code I want to see how it could look — can you design the main screens? Something warm and unfussy, phone app, light and dark mode. I want: home with saved recipes, a recipe detail, and what a brand-new user sees.",
-      "expected_output": "A mockup directory scaffolded from the skill assets with a customized design-system.css (warm palette, both themes), a filled DESIGN-SYSTEM.md contract, and an index.html whose sections cover home, detail, and first-run empty state with real copy, column labels, and rationale notes. Contrast pairs updated; foundations render green.",
+      "prompt": "I'm building a recipe-box app called Ladle. Can you mock up the main screens: home with saved recipes, a recipe detail, and what a brand-new user sees? iPhone, light and dark.",
+      "expected_output": "A mockup directory scaffolded from the skill assets (tokens.css, MOCKUP.md, mockup-core.*, phone.*, index.html, flow.html). Setup questions or stated defaults are about the canvas only (platforms, token source, themes, fonts, icons, location), not tone or brand coaching. index.html groups screens into sections by flow; every column has a name in 'Screen, state' form ('Home', 'Home, first run', 'Recipe'); no platform tags on an iOS-only page; states are in names, not tags. Screens use var(--…) and .t-* classes only. MOCKUP.md token tables filled; placeholder tokens listed as unset rather than an invented palette presented as the user's.",
       "files": []
     },
     {
       "id": 2,
-      "prompt": "We have a mockup directory at design/mockup built with the mobile-mockups-skill method (design-system.css, DESIGN-SYSTEM.md, index.html). Add a settings flow: notifications preferences, account, and a delete-account confirmation. Match the existing system exactly.",
-      "expected_output": "A new flow page (copied from flow.html, foundations: false) or new section using ONLY existing design-system values and .t-* roles — no new hexes or font sizes. Delete-account screen shows a danger treatment consistent with the contract; states beyond the happy path included; existing files not normalized or restyled.",
+      "prompt": "Our app's theme lives in src/theme.ts (colors, typography, spacing). Set up a phone mockup directory that uses exactly those values, then lay out the settings flow: notifications, account, delete account. We ship on iOS and Android.",
+      "expected_output": "tokens.css imported 1:1 from src/theme.ts with production names kebab-cased, light and dark blocks matching the theme, MOCKUP.md 'Token source' and production-name columns filled. A settings page copied from flow.html with sections per flow, named columns, and tagged Android columns only where Android screens differ (tag exactly 'Android'). Contrast audit run and failing pairs reported to the user without changing their values.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Our mockup's design system feels too corporate — client says it should feel 'like a cozy bookshop'. Can you rework the look without redoing every screen?",
-      "expected_output": "Changes concentrated in design-system.css role values (warmer surfaces, softer ink, serif display family, larger radii) plus DESIGN-SYSTEM.md updated to match; screens untouched or minimally touched. Contrast audit re-checked after the change; before/after foundations screenshots offered.",
+      "prompt": "Here's our mockup directory at design/mockup. Can you give me PNGs of the onboarding section, light and dark, plus just the paywall screen at full size?",
+      "expected_output": "Captures made through ?solo=<section-id> and ?theme=dark (not by scrolling the full page), at ?zoom=100 for the single screen, named by section and screen ids (onboarding.png, onboarding.dark.png, onboarding--paywall.png). Console checked first. No changes to screen content and no unsolicited design critique.",
       "files": []
     }
   ]

@@ -1,23 +1,22 @@
 {
-  "name": "app-design",
+  "name": "mockups",
   "owner": {
     "name": "Eugene Zharkov"
   },
   "metadata": {
-    "description": "Design apps in plain HTML instead of Figma: phone and desktop mockups on a per-project design system with a live WCAG contrast audit, App Store and Play screenshots, and app icons — all from one palette.",
-    "version": "2.0.0"
+    "description": "HTML mockups for agents: a canvas that groups, names, tags, frames and captures app screens, with the product's tokens wired through a live tokens section and contrast audit.",
+    "version": "3.0.0"
   },
   "plugins": [
     {
-      "name": "app-design",
-      "description": "Four skills that share one engine and one palette: mobile-mockups (iOS/Android screens), desktop-mockups (macOS/Windows windows and menu-bar panels), store-screenshots (App Store, Play and Mac App Store graphics with exact-size export), and app-icon (concepts, platform variants, export).",
+      "name": "mockups",
+      "description": "Three skills on one canvas engine: mobile-mockups (iOS and Android phone frames), desktop-mockups (macOS and Windows windows and menu-bar panels), and store-screenshots (mockup screens placed on App Store, Play and Mac App Store canvases, exported at exact sizes).",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/mobile-mockups",
         "./skills/desktop-mockups",
-        "./skills/store-screenshots",
-        "./skills/app-icon"
+        "./skills/store-screenshots"
       ]
     }
   ]

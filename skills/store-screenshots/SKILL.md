@@ -1,28 +1,37 @@
 ---
 name: store-screenshots
 description: >-
-  Turn an existing HTML mockup directory into store-listing graphics: App
-  Store iPhone screenshots, Google Play phone screenshots and feature
-  graphic, Mac App Store shots, and in-app purchase / subscription promo
-  images — composed from the product's own design-system.css and mockup
-  screens, captured with headless Chrome, and resampled to exact store
-  sizes. Also drafts the listing text (name, subtitle, promotional text,
-  keywords, descriptions) within each store's character limits. Use whenever
-  the user wants App Store screenshots, Play Store listing graphics, a
-  feature graphic, IAP or subscription images, "marketing screenshots",
-  store assets for a launch or update, or help writing the store listing —
-  even if they don't mention mockups or HTML.
+  Lay out store listing screenshots from an existing HTML mockup: place the
+  mockup's screens into store-size canvases (App Store iPhone, Google Play
+  phone and feature graphic, Mac App Store, in-app purchase images), name
+  and order the shots, check the text on each canvas for contrast and fit,
+  and export PNGs at the exact pixel sizes each store accepts. Use whenever
+  the user wants App Store or Play Store screenshots, a feature graphic, IAP
+  or subscription images, "marketing screenshots", or store assets for a
+  launch or update, even if they never mention mockups or HTML. The
+  headlines, captions and shot order are the user's; the skill owns the
+  canvases and the export. Needs a mockup from mobile-mockups or
+  desktop-mockups.
 ---
 
 # Store Screenshots
 
-A store listing is the product's first screen. This skill builds it the way
-the product was designed: plain static HTML, the same `design-system.css`,
-the same screens — so the listing can never drift into a different style
-than the app it sells, and every frame is reproducible from a URL.
+A store screenshot is a mockup screen placed on a store-size canvas with a
+line or two of text above it. This skill owns the canvas and the export: the
+frame sizes, how screens are placed and scaled, how each shot is named and
+ordered, how the text is checked against its background, and how every shot
+becomes a PNG at the exact size a store accepts.
 
-The output is a `store.html` page next to the mockup, an `export.sh` that
-captures it, and folders of PNGs at exact store sizes:
+It does not decide what the shots say. The headlines, captions, eyebrows,
+which screens to show and in what order: those come from the person. Take
+them as given. Where they leave a gap (a missing caption, an unnamed shot),
+fill it with the plainest wording that describes the screen, and say which
+ones you filled. Don't rewrite their headlines, propose a story, or coach
+the listing unless asked. Listing text (name, subtitle, keywords,
+descriptions) is out of scope.
+
+The output is a `store.html` page next to the mockup, `export.sh` beside it,
+and folders of PNGs:
 
 ```
 out/apple/iphone-6.9/   out/apple/iphone-6.5/   out/apple/iap/
@@ -30,142 +39,177 @@ out/google/phone/       out/google/feature-graphic.png
 out/mac/2880x1800/      out/mac/1280x800/
 ```
 
-## Phase 0 — Detect the mockup
+Part of a family that shares the canvas engine (`mockup-core.*`):
+**mobile-mockups** (phone screens) and **desktop-mockups** (macOS and
+Windows windows). Store shots place screens built there; they don't build
+new ones.
 
-This skill **requires** an existing mockup directory: `design-system.css`
-plus pages of screens built with `phone()` (mobile) or a window frame
-(desktop), with `mockup-core.js` beside them. Look in `design/mockup/`,
-`mockup/`, or wherever `design-system.css` lives.
+## Phase 0: detect the source mockup
 
-- Found: read its `DESIGN-SYSTEM.md` (the contract) and the pages whose
-  screens the story will use. You will copy screens, not invent them.
-- Not found: stop and say so. Store graphics composed without a design
-  system are a second, unmaintained art direction. Point the user to the
-  **mobile-mockups** skill (phone apps) or **desktop-mockups** skill (Mac /
-  desktop apps) to design the product first; come back after.
+This skill needs an existing mockup directory: `tokens.css` and pages of
+screens built with `phone()` or `win()`, with `mockup-core.js` beside them.
+Older mockups have `design-system.css` (and `DESIGN-SYSTEM.md`) instead; use
+them the same way. Look in `design/mockup/`, `mockup/`, or wherever the
+token file lives.
 
-Ask (one batched round, defaults in brackets): which stores [App Store +
-Play if both platforms exist], Mac App Store? [only if a desktop mockup
-exists], IAP/subscription products [none], locales [English only].
+- Found: read `MOCKUP.md` (or `DESIGN-SYSTEM.md`) and the pages whose
+  screens the shots will use. Note their screen ids
+  (`<section-id>--<name>[--<tag>]`, see `references/canvas.md` in the
+  mockup skills).
+- Not found: stop and say so. Point to **mobile-mockups** (phone apps) or
+  **desktop-mockups** (Mac and Windows apps) to lay out the screens first.
 
-## Phase 1 — Plan the story
+## Phase 1: setup questions
 
-Follow `references/storytelling.md`. Before writing any HTML, write the
-shot list as a table — order, eyebrow, headline, caption, which screen
-proves it — and agree it with the user. The rules that matter most:
+One batched round, only about the canvases and the export:
 
-- **Order is promise → evidence → explanation.** Frame 1 is the whole
-  pitch; most people never swipe past frame 3.
-- **One idea per shot.** If a frame needs "and", it is two frames.
-- **Headlines: short, one line where possible, benefit not feature.**
-  "Find any day in seconds", not "Full-text search".
-- **The device shows real product copy**, copied from the mockup — never
-  marketing paraphrase inside the screen.
-- 5–8 frames; one **night shot** mid-rail if the product has a dark theme.
+- Stores: App Store, Google Play, Mac App Store (only if a desktop mockup
+  exists).
+- Sizes: the defaults in `references/store-specs.md`, or specific slots the
+  person needs (iPad and Play tablet need a tablet frame the engine doesn't
+  ship).
+- In-app purchase images, and Play's feature graphic: wanted or not.
+- Locales: one set per locale; the headlines for each come from the person.
+- Light, dark, or both; which frames, if any, are forced dark.
+- The shots, in upload order: for each, the screen id to place and the
+  eyebrow, headline and caption they want.
 
-## Phase 2 — Build the shots
+If they give screens but no wording, use each screen's name as the headline
+and leave eyebrow and caption empty, and say so. If they give neither, stop
+and ask; choosing the shots is theirs. Default stores: App Store, plus Play
+when the mockup has Android screens.
 
-1. Copy from this skill's `assets/` into the mockup directory: `store.html`,
-   `store.css`, `store.js`, `export.sh` (and `mockup-core.*`, `phone.*`,
-   `window.*` if the mockup doesn't already have current copies).
-2. Give `store.html` the **same `<head>`** as the mockup pages: fonts, icon
-   library, `design-system.css`. Copy the screens' Layer-2 CSS block
-   verbatim (or link a shared `screens.css`).
-3. Copy each needed screen's template literal into `store.html` and make it
-   a function of platform — `(platform) => phone(…, { platform })` — so the
-   Play cut swaps status bar, camera cutout, back affordance and any
-   platform words (biometrics, cloud backup) from one source.
+## Phase 2: build the shots
+
+1. Copy from this skill's `assets/` into the mockup directory (or a sibling
+   `store/` folder): `store.html`, `store.css`, `store.js`, `export.sh`, and
+   `mockup-core.*`, `phone.*`, `window.*` if there are no current copies.
+2. Give `store.html` the same `<head>` as the mockup pages: fonts, icon
+   library, and the same token file (`tokens.css`, or `../mobile/tokens.css`
+   from a sibling folder). Copy the screen CSS the placed screens need,
+   unchanged.
+3. Copy each placed screen's template literal into `store.html` unchanged.
+   Make phone screens a function of platform,
+   `(platform) => phone(…, { platform })`, so the Play cut gets Android
+   chrome from one source. Platform-specific words that already differ in
+   the mockup's Android screen come from that screen.
 4. Declare frames as data and call `renderStorePage(cfg)`:
 
    ```js
    renderStorePage({
      title, intro,
      shots: [{ id, eyebrow, headline, caption, device, scale, y,
-               hero, night, overlay, android: { …overrides } }],
-     subs: [{ id, word, tag, glyph }],
+               hero, night, overlay, label, android: { …overrides } }],
+     subs: [{ id, word, tag, glyph, long }],
      feature: { mark, headline, art },
-     mac: [{ id, eyebrow, headline, caption, device: win(…) }],
+     mac: [{ id, eyebrow, headline, caption, device, scale, y, night }],
+     pageNotes: [note(…)],
    });
    ```
 
-   `device` accepts any rendered frame HTML — `phone(…)`, `win(…)`, a bare
-   card stack — or a function of platform. `scale` (default 1) lets the
-   device bleed off the bottom edge; `overlay` is a breakout element (a
-   zoomed card) above the device.
-5. Store-only composition (glow position, breakout cards, feature art)
-   goes in the page's `<style>` using design-system values. No new hexes:
-   frame backgrounds are the canvas role, washes are `--accent-tint`.
+   `device` is any rendered frame HTML (`phone(…)`, `win(…)`) or a function
+   of platform. `scale` (default 1) and `y` place the device in the frame;
+   `overlay` is an element above the device; `hero` gives the frame a taller
+   copy band; `night` forces it dark in both themes; `android: {…}`
+   overrides any field for the Play cut only.
+5. Frame layout for this page only (a glow position, an overlay, the
+   feature graphic's art) goes in the page's `<style>`, using token values.
+6. Record in `pageNotes` which screen id each shot places, and any wording
+   you filled in.
 
-URL modes (all deterministic):
+## Naming
+
+| Thing | Format | Example |
+| --- | --- | --- |
+| Shot `id` | kebab-case, stable | `hero`, `look-back`, `mac-today` |
+| Export name | `NN-<id>`, NN = 1-based position in its array | `01-hero` |
+| IAP image | its `id`, no number | `plus-monthly` |
+| Feature graphic | fixed | `feature-graphic` |
+| Gallery screen id | `<section>--<export name>[--<tag>]` | `iphone--01-hero`, `android--01-hero--android`, `mac--01-mac-today--macos` |
+| PNG | `out/<store>/<slot>/<export name>.png` | `out/apple/iphone-6.9/01-hero.png` |
+
+- The array order is the upload order; reordering renumbers the files, so
+  delete old PNGs in `out/` after a reorder.
+- Each shot's iPhone and Play versions share the export name; the folder
+  tells them apart.
+- Gallery sections are `iphone`, `android`, `subs`, `feature`, `mac`,
+  `contrast`. Columns are named by export name, so a screen id matches its
+  PNG. iOS is the page's primary platform, so Play and feature-graphic
+  columns carry the `Android` tag and Mac columns `macOS`; hero and night
+  are frame options shown in the label, never tags.
+- Per locale, keep one `store.html` per locale (`store.de.html`) or one
+  `OUT` folder per locale; file names stay the same across locales.
+
+## URL modes
 
 | URL | Renders |
 | --- | --- |
-| `store.html` | gallery: every set + marketing-text contrast audit |
+| `store.html` | gallery: every set + store-text contrast audit |
+| `?solo=<section>` | one gallery section (`iphone`, `android`, …) |
 | `?shot=N` | iPhone frame N alone at the page origin, 440×956 |
-| `?shot=N&platform=android` | the same frame re-cut to Play 9:16, 440×782 |
+| `?shot=N&platform=android` | the same frame cut to Play 9:16, 440×782 |
 | `?sub=N` | IAP / subscription square, 512×512 |
 | `?feature` | Play feature graphic, 512×250 |
 | `?mac=N` | Mac App Store frame, 1440×900 |
-| `&theme=dark` | any of the above with dark screens |
-| `?manifest` | frame names for `export.sh` |
+| `&theme=dark` | any of the above with dark tokens |
+| `?manifest` | `kind index name` lines for `export.sh` |
 
-## Phase 3 — Review
+## Phase 3: capture and check
 
-Follow `references/review.md`: serve over http, check the console,
-screenshot the gallery and single frames (`?shot=N`), light and dark. Then
-the store-specific checks:
+Follow `references/review.md` for serving and the console. Then check the
+canvases:
 
-- **Contrast audit** at the bottom of the gallery is green — every
-  headline, caption and eyebrow against its frame background, both themes.
-  Marketing text is text; fix failures in role values or the background.
-- **Headline lines**: the audit counts them. Over two (three on the hero)
-  means the headline is too long — rewrite it, don't shrink it.
-- **Copy band fits**: no headline pushes into the device.
-- **Thumbnail test**: view the gallery at 50% zoom. Can you still read
-  frame 1's headline and see what the device shows?
-- **Platform truth**: Android frames say Android things (no Face ID, no
-  iCloud, no Dynamic Island).
+1. **Console** is clean; every frame renders its device.
+2. **Placement**: each shot shows the screen id it was given, unchanged;
+   nothing important cut off by the frame edge unless asked.
+3. **Copy band**: the contrast section reports `fits` for every frame. An
+   overflowing band means the text runs into the device; report it with the
+   line count and let the person choose (shorter text, a smaller `scale`,
+   or a larger `y`).
+4. **Contrast**: every eyebrow, headline and caption against its frame
+   background, light and dark. Report failures; the values live in
+   `tokens.css` and are the product's call.
+5. **Platform chrome**: Play frames show Android chrome; Mac frames a macOS
+   window.
+6. **Names**: shot ids kebab-case and unique; the manifest lists them in
+   the intended order.
 
-## Phase 4 — Export
+Show the person the gallery sections, two to four frames at a time, each
+with its export name. Don't critique the wording or the order unless asked.
 
-Run `./export.sh [apple|google|mac|all]` and read its size report. The rule
-it encodes, learned the hard way: **capture at the authoring size × an
-integer scale, then resample to the exact store size.** Shrinking or
-reshaping the capture window instead reflows the page and re-wraps
-headlines. Sizes and their sources are in `references/store-specs.md`;
-`references/capture.md` covers headless-browser failures. Always open a
-few output PNGs and look at them — a blank or half-loaded capture still has
-the right pixel size.
+## Phase 4: export
 
-## Phase 5 — Listing text
-
-Follow `references/listing-text.md`: fill its template for each store,
-count characters, and keep the voice of the headlines. Save it beside the
-graphics (`out/` or a `listing.md`) so text and images ship together.
+Serve the page over http and run
+`STORE_PAGE=http://localhost:PORT/store.html ./export.sh [apple|google|mac|all]`.
+It reads `?manifest`, captures each frame at its authoring size × an integer
+scale, resamples to each store size, and prints every PNG's real pixel size.
+Check the sizes against `references/store-specs.md`, then open a few PNGs:
+a blank or half-loaded capture still has the right pixel size.
+`references/capture.md` covers headless-browser failures.
 
 ## Rules
 
-- No mockup, no store graphics. Design the product first.
-- One style: the product's `design-system.css`. The store page adds layout,
-  never a palette.
-- In-device copy is product copy, verbatim. Headlines are the only
-  marketing words.
-- Authoring size × integer scale → resample. Never capture at store size.
-- One frame per URL. Never deep-scroll a long gallery for a capture.
-- Store sizes change: verify against App Store Connect / Play Console
+- No mockup, no store shots. Screens are placed, never redrawn.
+- Wording and order are the person's. Fill gaps plainly and say so.
+- The store page uses the mockup's token file; it adds layout, never new
+  colors or fonts.
+- Authoring size × integer scale, then resample. Never capture at store
+  size.
+- One frame per URL. Never capture by scrolling the gallery.
+- The contrast audit reports; the person decides.
+- Store sizes change: verify against App Store Connect and Play Console
   before each submission.
 
 ## Files
 
 | Path | What it is |
 | --- | --- |
-| `assets/store.html` | Starter page: head, Layer-2 slot, placeholder frames |
-| `assets/store.css` | Frame anatomy for every store kind + export mode (roles only) |
-| `assets/store.js` | `renderStorePage()`, frame builders, URL modes, contrast audit, manifest |
-| `assets/export.sh` | Headless Chrome capture + `sips`/ImageMagick resample, size table |
+| `assets/store.html` | Starter page: head, screen CSS slot, placeholder frames |
+| `assets/store.css` | Frame sizes and anatomy for every store kind, export mode |
+| `assets/store.js` | `renderStorePage()`, frame builders, URL modes, manifest, contrast audit |
+| `assets/export.sh` | Headless Chrome capture, `sips`/ImageMagick resample, size report |
 | `assets/mockup-core.*`, `phone.*`, `window.*` | Shared engine and device frames (synced copies) |
-| `references/storytelling.md` | Shot order, headline writing, localization, marketing contrast |
-| `references/store-specs.md` | Required sizes per store and what to verify |
-| `references/listing-text.md` | Metadata template with character limits |
+| `references/store-specs.md` | Store sizes, limits and formats, and what to verify |
 | `references/capture.md` | Headless capture troubleshooting |
-| `references/review.md` | Shared review loop: serving, screenshots, critique |
+| `references/tokens.md` | Token file structure (shared) |
+| `references/review.md` | Serving, URLs, capturing (shared) |

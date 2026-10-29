@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Card</title>
+    <!--
+      Source of the README images (2000×1000): ?card=social (social-card.jpg)
+      and one demo card per skill, ?card=mobile|desktop|store. The window on
+      the right is the live Fieldnote example, not a drawing of it; callouts
+      are placed by measuring the canvas elements inside it, so they follow
+      the engine if it changes. Regenerate them all with render.sh.
+    -->
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        width: 2000px;
+        height: 1000px;
+        overflow: hidden;
+        font-family: -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        background: #ffffff;
+        position: relative;
+        color: #1b1b1b;
+      }
+      .copy {
+        position: absolute;
+        left: 90px;
+        width: 640px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .copy h1 {
+        font-size: 80px;
+        line-height: 86px;
+        font-weight: 700;
+        letter-spacing: -2.4px;
+      }
+      .copy p {
+        margin-top: 30px;
+        font-size: 29px;
+        line-height: 42px;
+        color: #5c5c5c;
+      }
+      .copy p b {
+        color: #0067c0;
+        font-weight: 600;
+      }
+      .cmd {
+        margin-top: 42px;
+        display: inline-block;
+        background: #0067c0;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 22px 28px;
+        font: 600 24px/1 ui-monospace, "SF Mono", Menlo, monospace;
+        white-space: nowrap;
+      }
+
+      .cmd[hidden] {
+        display: none;
+      }
+
+      /* Demo cards: no copy, the canvas takes the whole card. */
+      body.demo .copy {
+        display: none;
+      }
+      body.demo .browser {
+        left: 150px;
+        top: 110px;
+        width: 1700px;
+        height: 820px;
+      }
+
+      /* Browser window holding the live canvas. */
+      .browser {
+        position: absolute;
+        left: 820px;
+        top: 70px;
+        width: 1110px;
+        height: 860px;
+        border-radius: 16px;
+        background: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px #d6d6d6, 0 24px 60px -30px rgba(0, 0, 0, 0.25);
+      }
+      .bar {
+        height: 54px;
+        background: #fafafa;
+        border-bottom: 1px solid #e1e1e1;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 0 20px;
+      }
+      .dots {
+        display: flex;
+        gap: 8px;
+      }
+      .dots i {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #d4d4d4;
+      }
+      .url {
+        flex: 1;
+        height: 34px;
+        border-radius: 9px;
+        background: #efefef;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        font: 500 17px/1 ui-monospace, "SF Mono", Menlo, monospace;
+        color: #6b6b6b;
+        white-space: nowrap;
+      }
+      .url b {
+        color: #1b1b1b;
+        font-weight: 600;
+      }
+      .view {
+        position: relative;
+        height: 806px;
+        overflow: hidden;
+      }
+      .view iframe {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border: 0;
+        width: 1480px;
+        height: 1300px;
+        transform-origin: 0 0;
+      }
+
+      /* Callouts: a blue box plus a leader line to the measured element. */
+      .callout {
+        position: absolute;
+        background: #0067c0;
+        color: #ffffff;
+        border-radius: 6px;
+        padding: 10px 15px;
+        font-size: 19px;
+        font-weight: 600;
+        line-height: 1.25;
+        white-space: nowrap;
+        z-index: 3;
+      }
+      .callout code {
+        display: block;
+        margin-top: 3px;
+        font: 500 15px/1.3 ui-monospace, "SF Mono", Menlo, monospace;
+        color: #cfe4f7;
+      }
+      svg.leaders {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .ring {
+        position: absolute;
+        border: 3px solid #0067c0;
+        border-radius: 10px;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="copy">
+      <h1 id="headline"></h1>
+      <p id="text"></p>
+      <div class="cmd" id="cmd" hidden></div>
+    </div>
+
+    <div class="browser" id="browser">
+      <div class="bar">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div class="url" id="url"></div>
+      </div>
+      <div class="view">
+        <iframe id="canvas" scrolling="no"></iframe>
+      </div>
+    </div>
+
+    <svg class="leaders" id="leaders" width="2000" height="1000"></svg>
+
+    <script>
+      /* One entry per card. page/query: the live example to show; scale and
+         shift: how it sits in the browser view; callouts(d, cols): what to
+         point at, positioned relative to each target's box. */
+      const MOBILE_CALLOUTS = (d, cols) => [
+        [d.querySelector(".sec-head h2"), "Section = one flow", "id: daily-loop", (b) => ({ x: b.x - 290, y: b.y - 18 })],
+        [document.querySelector(".url"), "Every view is a URL", "", (b) => ({ x: b.x - 260, y: b.y - 60 }), 2],
+        [cols[1].querySelector(".tag"), "Platform tag: “Android”", "glyph added for iOS · Android · macOS · Windows", (b) => ({ x: b.x + 70, y: b.y - 100 })],
+        [cols[2].querySelector(".tag"), "Variant tag: “Large text”", "", (b) => ({ x: b.x + b.w + 50, y: b.y - 12 })],
+        [cols[0].querySelector(".col-name"), "Every screen has a name", "“Today”", (b) => ({ x: b.x - 170, y: b.y + 90 })],
+        [cols[1].querySelector(".col-name"), "…and an id", "#daily-loop--today--android", (b) => ({ x: b.x - 20, y: b.y + 160 })],
+        [cols[3].querySelector(".screen"), "Frames at real size, 1:1", "390×844 pt · values from tokens.css", (b) => ({ x: b.x - 120, y: b.y + b.h + 100 }), 0],
+      ];
+
+      const CARDS = {
+        social: {
+          headline: "The mockup architecture",
+          text: "<b>mockup-skills</b> — your screens in plain HTML, grouped into flows, named, tagged, framed at real size and captured by URL. For Claude Code, Codex, Cursor, and more.",
+          cmd: "npx skills add euzharkov/mockup-skills",
+          page: "fieldnote/mobile/",
+          query: "?solo=daily-loop&theme=dark&zoom=70",
+          scale: 0.75,
+          shift: { x: 15, y: -105 },
+          callouts: MOBILE_CALLOUTS,
+        },
+        mobile: {
+          page: "fieldnote/mobile/",
+          query: "?solo=daily-loop&theme=dark&zoom=70",
+          scale: 0.76,
+          shift: { x: 0, y: -150 },
+          callouts: (d, cols) => [
+            [d.querySelector(".sec-head h2"), "Section = one flow", "id: daily-loop", (b) => ({ x: b.x + b.w + 50, y: b.y - 16 })],
+            [document.querySelector(".url"), "Every view is a URL", "", (b) => ({ x: b.x + 40, y: b.y + 55 }), 2],
+            [d.querySelector(".toolbar"), "Theme and zoom", "?theme=dark · ?zoom=50|70|85|100", (b) => ({ x: b.x + b.w - 430, y: b.y + b.h + 50 })],
+            [cols[1].querySelector(".tag"), "Platform tag: “Android”", "glyph added for iOS · Android · macOS · Windows", (b) => ({ x: b.x + 330, y: b.y - 100 })],
+            [cols[2].querySelector(".tag"), "Variant tag: “Large text”", "", (b) => ({ x: b.x + b.w + 60, y: b.y - 14 })],
+            [cols[0].querySelector(".col-name"), "Every screen has a name", "“Today”", (b) => ({ x: b.x - 60, y: b.y + 80 })],
+            [cols[1].querySelector(".col-name"), "…and an id", "#daily-loop--today--android", (b) => ({ x: b.x + 60, y: b.y + 80 })],
+            [cols[3].querySelector(".screen"), "Frames at real size, 1:1", "390×844 pt · values from tokens.css", (b) => ({ x: b.x + b.w * 0.4, y: b.y + b.h + 85 }), 0],
+            [cols[5].querySelector(".statusbar"), "Platform chrome", "Android status bar and punch-hole; iOS Dynamic Island", (b) => ({ x: b.x - 160, y: b.y + 150 }), 2],
+          ],
+        },
+        desktop: {
+          page: "fieldnote/desktop/",
+          query: "?solo=windows&theme=dark&zoom=70",
+          scale: 0.86,
+          shift: { x: 0, y: -175 },
+          callouts: (d, cols) => [
+            [d.querySelector(".sec-head h2"), "Section = one flow", "id: windows", (b) => ({ x: b.x + b.w + 60, y: b.y - 16 })],
+            [document.querySelector(".url"), "Every view is a URL", "", (b) => ({ x: b.x + 40, y: b.y + 55 }), 2],
+            [d.querySelector(".toolbar"), "Theme and zoom", "?theme=dark · ?zoom=50|70|85|100", (b) => ({ x: b.x + b.w - 430, y: b.y + b.h + 50 })],
+            [cols[0].querySelector(".tag"), "Platform tag: “Windows”", "glyph added for iOS · Android · macOS · Windows", (b) => ({ x: b.x + b.w + 340, y: b.y - 78 })],
+            [textOf(cols[0].querySelector(".w-meta")), "Declared window size", "1080 × 700 pt · min 820 × 520 · sidebar 260", (b) => ({ x: b.x + 40, y: b.y + 150 }), 4],
+            [cols[0].querySelector(".w-caps"), "Platform chrome", "Windows caption buttons; macOS traffic lights", (b) => ({ x: b.x + 60, y: b.y + 55 })],
+            [cols[0].querySelector(".col-name"), "Every window has a name", "“Journal, reading a note”", (b) => ({ x: b.x - 120, y: b.y + 90 })],
+            [cols[1].querySelector(".col-name"), "…and an id", "#windows--delete-dialog--windows", (b) => ({ x: b.x - 60, y: b.y + 90 })],
+          ],
+        },
+        store: {
+          page: "fieldnote/store/store.html",
+          query: "?solo=iphone&zoom=50",
+          scale: 1,
+          shift: { x: 0, y: -235 },
+          callouts: (d, cols) => [
+            [d.querySelector(".sec-head h2"), "Section = one store slot", "id: iphone", (b) => ({ x: b.x + b.w + 60, y: b.y - 16 })],
+            [document.querySelector(".url"), "Every view is a URL", "", (b) => ({ x: b.x + 820, y: b.y + 55 }), 2],
+            [d.querySelector(".toolbar"), "Theme and zoom", "?theme=dark · ?zoom=50|70|85|100", (b) => ({ x: b.x + b.w - 430, y: b.y + b.h + 50 })],
+            [cols[0].querySelector(".store-headline"), "Headline as given", "your words; the canvas checks fit and contrast", (b) => ({ x: b.x + b.w + 60, y: b.y - 90 })],
+            [[cols[1].querySelector(".phone"), cols[1].querySelector(".shot")], "The mockup's own screen", "from ../mobile, same tokens.css", (b) => ({ x: b.x + b.w * 0.5, y: b.y + 160 }), 0],
+            [cols[0].querySelector(".col-name"), "Shot name = file name", "out/apple/iphone-6.9/01-hero.png", (b) => ({ x: b.x - 120, y: b.y + 80 })],
+            [cols[3].querySelector(".col-name"), "Night shot", "04-night · dark tokens in both themes", (b) => ({ x: b.x + 100, y: b.y + 80 })],
+            [cols[2].querySelector(".shot"), "Exact store size", "440×956 → 1320×2868 (6.9″) · 1284×2778 (6.5″)", (b) => ({ x: b.x - 150, y: b.y + b.h + 90 }), 0],
+          ],
+        },
+        tokens: {
+          /* Two windows on the same page: the top of the tokens section, and
+             the same section scrolled to its spacing, radii and audit. */
+          page: "fieldnote/mobile/",
+          query: "?solo=tokens",
+          rect: { left: 110, top: 110, width: 870, height: 820 },
+          scale: 0.68,
+          shift: { x: 13, y: -170 },
+          second: { rect: { left: 1020, top: 110, width: 870, height: 820 }, anchor: ".fd-block:nth-child(3)" },
+          callouts: (d, cols, d2) => [
+            [d.querySelector(".sec-head h2"), "Tokens section", "read live from tokens.css", (b) => ({ x: b.x + b.w + 60, y: b.y - 16 })],
+            [d.querySelector(".fd-swatch"), "Color token, light over dark", "--canvas · #f5f1ea · #111111", (b) => ({ x: b.x + 70, y: b.y + b.h + 40 })],
+            [d.querySelector(".fd-type-row"), "Type role = one class", ".t-display · 34/40 · 600 · −0.3px · Newsreader", (b) => ({ x: b.x + 120, y: b.y + b.h + 30 })],
+            [d2.querySelector(".fd-space-row").parentElement, "Spacing scale", "--space-1 … --space-10", (b) => ({ x: b.x + 320, y: b.y + 40 })],
+            [d2.querySelector(".fd-radius-row"), "Radii", "--radius-small · control · card · pill", (b) => ({ x: b.x + b.w - 390, y: b.y + b.h + 14 })],
+            [[d2.querySelector(".fd-audit"), document.getElementById("browser2")], "Contrast audit, light and dark", "WCAG 2.1 ratio per declared pair; it reports, you decide", (b) => ({ x: b.x + 60, y: b.y + 240 })],
+          ],
+        },
+      };
+
+      const card = CARDS[new URLSearchParams(location.search).get("card") || "social"];
+      if (card.headline) {
+        document.getElementById("headline").textContent = card.headline;
+        document.getElementById("text").innerHTML = card.text;
+      } else document.body.classList.add("demo");
+      if (card.cmd) {
+        const cmd = document.getElementById("cmd");
+        cmd.textContent = card.cmd;
+        cmd.hidden = false;
+      }
+      document.getElementById("url").innerHTML = `${card.page.replace(/index\.html$/, "")}<b>${card.query.replace(/&/g, "&amp;")}</b>`;
+
+      /* Each browser window is a view: its iframe, scale and shift. Callouts
+         look up the view an element belongs to by its document. */
+      const VIEWS = new Map();
+      const mainBrowser = document.getElementById("browser");
+      if (card.rect) Object.assign(mainBrowser.style, Object.fromEntries(Object.entries(card.rect).map(([k, v]) => [k, v + "px"])));
+      const frame = document.getElementById("canvas");
+      frame.src = "../" + card.page + card.query;
+      place(mainBrowser, card.scale, card.shift);
+
+      let frame2 = null;
+      if (card.second) {
+        const b2 = mainBrowser.cloneNode(true);
+        b2.id = "browser2";
+        Object.assign(b2.style, Object.fromEntries(Object.entries(card.second.rect).map(([k, v]) => [k, v + "px"])));
+        document.body.insertBefore(b2, document.getElementById("leaders"));
+        frame2 = b2.querySelector("iframe");
+        frame2.id = "canvas2";
+        frame2.src = "../" + card.page + card.query;
+      }
+
+      function place(browser, scale, shift) {
+        const f = browser.querySelector("iframe");
+        f.style.transform = `translate(${shift.x}px, ${shift.y}px) scale(${scale})`;
+        /* Wide enough to fill the browser view at this scale. */
+        f.style.width = Math.ceil((browser.querySelector(".view").clientWidth - shift.x) / scale) + "px";
+        f.style.height = Math.ceil((browser.querySelector(".view").clientHeight - shift.y) / scale) + "px";
+      }
+
+      /* The box of an element's text, not the element (a full-width line). */
+      function textOf(el) {
+        const r = el.ownerDocument.createRange();
+        r.selectNodeContents(el);
+        return r;
+      }
+
+      /* Element (or range) box inside an iframe → card coordinates. */
+      function boxOf(el) {
+        const doc = el.ownerDocument || el.startContainer.ownerDocument;
+        const r = el.getBoundingClientRect();
+        if (doc === document) return { x: r.left, y: r.top, w: r.width, h: r.height };
+        const v = VIEWS.get(doc);
+        const view = v.browser.querySelector(".view").getBoundingClientRect();
+        return {
+          x: view.left + v.shift.x + r.left * v.scale,
+          y: view.top + v.shift.y + r.top * v.scale,
+          w: r.width * v.scale,
+          h: r.height * v.scale,
+        };
+      }
+
+      /* target: an element or range, or [target, clip] to ring only the part
+         of target inside clip (a phone cut off by its store canvas). */
+      function callout(target, title, code, at, pad = 6) {
+        let b;
+        if (Array.isArray(target)) {
+          const t = boxOf(target[0]);
+          const c = boxOf(target[1]);
+          const x = Math.max(t.x, c.x);
+          const y = Math.max(t.y, c.y);
+          b = { x, y, w: Math.min(t.x + t.w, c.x + c.w) - x, h: Math.min(t.y + t.h, c.y + c.h) - y };
+        } else b = boxOf(target);
+        const ring = document.createElement("div");
+        ring.className = "ring";
+        Object.assign(ring.style, {
+          left: b.x - pad + "px",
+          top: b.y - pad + "px",
+          width: b.w + pad * 2 + "px",
+          height: b.h + pad * 2 + "px",
+        });
+        document.body.appendChild(ring);
+
+        const c = document.createElement("div");
+        c.className = "callout";
+        c.innerHTML = title + (code ? `<code>${code}</code>` : "");
+        const p = at(b);
+        c.style.left = p.x + "px";
+        c.style.top = p.y + "px";
+        document.body.appendChild(c);
+
+        /* Leader from the callout's nearest edge to the ring's nearest edge. */
+        const cr = c.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2;
+        const cy = cr.top + cr.height / 2;
+        const tx = Math.max(b.x - pad, Math.min(cx, b.x + b.w + pad));
+        const ty = Math.max(b.y - pad, Math.min(cy, b.y + b.h + pad));
+        const sx = Math.max(cr.left, Math.min(tx, cr.right));
+        const sy = Math.max(cr.top, Math.min(ty, cr.bottom));
+        document.getElementById("leaders").innerHTML +=
+          `<line x1="${sx}" y1="${sy}" x2="${tx}" y2="${ty}" stroke="#0067c0" stroke-width="2.5"/>` +
+          `<circle cx="${tx}" cy="${ty}" r="5" fill="#0067c0"/>`;
+      }
+
+      const loaded = (f) => new Promise((ok) => (f.contentDocument && f.contentDocument.readyState === "complete" && f.contentDocument.URL !== "about:blank" ? ok() : f.addEventListener("load", ok)));
+
+      function prepare(d, shift, scale) {
+        /* The solo banner is cropped at the top edge; hide it rather than show a sliver. */
+        const banner = d.querySelector(".solo-banner");
+        if (banner) banner.style.visibility = "hidden";
+        /* The toolbar is fixed to the page's top edge, which the crop hides;
+           pin it to the top of the visible area instead. */
+        const tb = d.querySelector(".toolbar");
+        if (tb) tb.style.top = Math.round(-shift.y / scale + 18) + "px";
+        /* White behind the frames, to match the card. */
+        d.body.style.background = "#ffffff";
+      }
+
+      Promise.all([loaded(frame), frame2 ? loaded(frame2) : null]).then(() => {
+        /* Let fonts and the canvas render before measuring. */
+        setTimeout(() => {
+          const d = frame.contentDocument;
+          prepare(d, card.shift, card.scale);
+          VIEWS.set(d, { browser: mainBrowser, scale: card.scale, shift: card.shift });
+          let d2 = null;
+          if (frame2) {
+            d2 = frame2.contentDocument;
+            /* Second window: same scale, scrolled so the anchor sits near its top. */
+            const top = d2.querySelector(card.second.anchor).getBoundingClientRect().top;
+            const shift2 = { x: card.shift.x, y: -Math.round((top - 40) * card.scale) };
+            place(frame2.closest(".browser"), card.scale, shift2);
+            prepare(d2, shift2, card.scale);
+            d2.querySelector(".toolbar").style.visibility = "hidden";
+            VIEWS.set(d2, { browser: frame2.closest(".browser"), scale: card.scale, shift: shift2 });
+          }
+          const cols = d.querySelectorAll(".col");
+          for (const args of card.callouts(d, cols, d2)) callout(...args);
+        }, 2500);
+      });
+    </script>
+  </body>
+</html>

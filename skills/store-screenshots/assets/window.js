@@ -26,7 +26,7 @@
  * authored numbers.
  *
  * Every frame wraps product content in .screen (the core's contract), so
- * the dark palette, `night`, and foundations probes work exactly as in
+ * the dark palette, `night`, and token probes work exactly as in
  * phone.js. OS chrome (traffic lights, caption buttons, menu bar, tray) is
  * dependency-free inline SVG. Native controls (ctl.*) stand in for the OS's
  * own controls — production uses the real ones, so these mirror the OS,
@@ -141,7 +141,7 @@ function sideNav(items, active) {
 
 /* Native controls take their platform from the frame they sit in (CSS keys
    off .p-macos / .p-windows on the frame), so they need no platform arg.
-   Accent and surfaces derive from design-system roles: --accent-interactive
+   Accent and surfaces derive from token roles: --accent-interactive
    for "on", --btn-label for its label, --card / ink tints for the rest. */
 const ctl = {
   /** kind: "default" (accent, the Return-key action) | "normal" | "danger"

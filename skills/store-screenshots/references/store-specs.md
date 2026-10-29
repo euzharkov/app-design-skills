@@ -1,7 +1,7 @@
 # Store specs
 
 Sizes below are current as of this skill's writing (late 2026). **Stores
-change them** — new devices add slots, old slots become optional. Before a
+change them**: new devices add slots, old slots become optional. Before a
 submission, check the live requirements:
 
 - App Store Connect Help → "Screenshot specifications" and "App preview
@@ -28,57 +28,48 @@ invisible; capturing at a different window size re-wraps headlines.
 
 ## Apple App Store
 
-**iPhone** — portrait (landscape also accepted, rarely worth it):
+**iPhone**, portrait (landscape is also accepted):
 
 | Display class | Accepted sizes (portrait) | Notes |
 | --- | --- | --- |
 | 6.9″ | 1320×2868, 1290×2796, 1260×2736 | The required set. Apple scales it down for smaller devices. |
-| 6.5″ | 1284×2778, 1242×2688 | Only required if no 6.9″ set is provided; still useful as a fallback. |
+| 6.5″ | 1284×2778, 1242×2688 | Only required if no 6.9″ set is provided; useful as a fallback. |
 
 Up to 10 screenshots per localization; the first 3 show in search results.
 
-**iPad** (only if the app runs on iPad): 13″ — 2064×2752 or 2048×2732
-portrait. iPad frames need their own authoring (≈3:4) and a tablet device
-frame; don't stretch phone shots. The engine ships no tablet frame yet —
-author one in the page or skip iPad.
+**iPad** (only if the app runs on iPad): 13″, 2064×2752 or 2048×2732
+portrait. iPad frames need their own authoring size (about 3:4) and a tablet
+device frame; don't stretch phone shots. The engine ships no tablet frame
+yet, so either author one in the page or leave iPad out and say so.
 
 **Mac App Store**: 16:10, one of 1280×800, 1440×900, 2560×1600,
-2880×1800. 1–10 screenshots. Export the largest; downscale for others.
+2880×1800. 1 to 10 screenshots. Export the largest; downscale for others.
 
-**In-app purchase / subscription image** ("Image" / promotional image in
-the IAP's App Store promotion section): 1024×1024. Shown small (≈60pt)
-beside Apple's own name, price and billing text — a brand card, not a
-feature pitch. Optional for most purchases; used for promoted IAPs, win-back
-offers and offer codes.
-
-**App icon**: 1024×1024 in the Xcode asset catalog, opaque, no rounded
-corners (the system masks it). Comes from the app-icon workflow, not here.
+**In-app purchase / subscription image** (the image in the IAP's App Store
+promotion section): 1024×1024. Shown small (about 60pt) beside Apple's own
+name, price and billing text. Optional for most purchases; used for
+promoted IAPs, win-back offers and offer codes.
 
 **Format**: PNG or JPEG, RGB, no transparency. `export.sh` flattens.
 
 ## Google Play
 
-**Phone screenshots**: JPEG or 24-bit PNG (no alpha). Each side 320–3840
-px, long side ≤ 2× short side. 2–8 per device type. **For promotion
-eligibility** (recommendations, "Apps & games" surfaces) Play asks for at
-least 4 screenshots at **16:9 or 9:16** with each side **≥ 1080 px** —
+**Phone screenshots**: JPEG or 24-bit PNG (no alpha). Each side 320 to 3840
+px, long side at most 2× the short side. 2 to 8 per device type. For
+promotion eligibility (recommendations, "Apps & games" surfaces) Play asks
+for at least 4 screenshots at **16:9 or 9:16** with each side **≥ 1080 px**,
 hence 1080×1920. Other aspects upload but lose eligibility.
 
-**Tablet screenshots** (7″ and 10″): same format rules; 16:9 / 9:16, each
-side ≥ 1080 px (10″: ≥ 1080 short side) for eligibility. Needs a tablet
-frame — not covered by the engine yet.
+**Tablet screenshots** (7″ and 10″): same format rules; 16:9 or 9:16, each
+side ≥ 1080 px for eligibility. Needs a tablet frame, which the engine
+doesn't ship yet.
 
 **Feature graphic**: exactly **1024×500**, JPEG or 24-bit PNG, no alpha.
-Shown atop the listing, behind a promo video's play button, and cropped on
-some surfaces: keep the promise in the left/center safe area, no small
-text, no device screenshots.
+Shown at the top of the listing and behind a promo video's play button; some
+surfaces crop it and overlay the play button in the center.
 
-**Hi-res icon**: **512×512**, 32-bit PNG (alpha allowed), ≤ 1 MB. Full
-square — Play applies its own mask and shadow. Pass `ICON=path` to
-`export.sh` to resample a 1024 master.
+**Hi-res icon**: **512×512**, 32-bit PNG (alpha allowed), ≤ 1 MB. The icon
+is the person's; `export.sh` only resamples one they hand over
+(`ICON=path/to/icon-1024.png`) to `google/icon.png`.
 
 **Format**: Play rejects alpha in screenshots and the feature graphic.
-
-## Text limits
-
-See `listing-text.md` — they live with the template.

@@ -3,20 +3,26 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "We're launching our habit-free meal planner on the App Store and Google Play next month. The mockups are in design/mockup (design-system.css, index.html with all the screens). Can you make the store screenshots for both stores?",
-      "expected_output": "store.html, store.css, store.js and export.sh copied into design/mockup; store.html links the existing design-system.css and copies (not redraws) the needed screens, as functions of platform. A 5–8 frame shot list ordered promise → evidence → explanation with short benefit headlines, agreed before building. Gallery renders iPhone and Play rails; the marketing-text contrast audit is green and headlines are ≤2 lines. export.sh run: apple/iphone-6.9 at 1320×2868, apple/iphone-6.5 at 1284×2778, google/phone at 1080×1920, sizes verified from the size report and a few PNGs opened.",
+      "prompt": "We're launching our meal planner on the App Store and Google Play next month. The mockups are in design/mockup (tokens.css, index.html with all the screens). Make the store screenshots for both stores. Shots in this order: home--week-plan with 'Plan the week in five minutes', recipe--detail with 'Every recipe, one tap away', shopping--list with 'The list writes itself', settings--household with 'Cook for everyone'.",
+      "expected_output": "store.html, store.css, store.js and export.sh copied next to the mockup; store.html links the existing tokens.css and copies the four named screens unchanged as functions of platform. Four shots in the given order with the given headlines verbatim (no rewritten headlines, no extra shots, no story advice); shot ids kebab-case, export names 01-… to 04-…. Gallery shows iphone and android sections, Play columns tagged Android, contrast section reports both themes. export.sh run over http: apple/iphone-6.9 at 1320×2868, apple/iphone-6.5 at 1284×2778, google/phone at 1080×1920, sizes read from the report and a few PNGs opened.",
       "files": []
     },
     {
       "id": 2,
-      "prompt": "I need a Play Store feature graphic and the 1024 promo images for our two subscription tiers (Pro Monthly, Pro Yearly). Also write the Play short and full description.",
-      "expected_output": "Detects the mockup directory first (or stops and points to mobile-mockups if none exists). Adds subs and feature to renderStorePage: ?sub=0/1 export at 1024×1024, ?feature at 1024×500, using design-system roles only (no new hexes), promise kept in the feature graphic's left half with no small text or device screenshots. Listing text follows listing-text.md: Play short description ≤80 chars, full description ≤4000, character counts checked, same voice as the headlines, no price in IAP descriptions.",
+      "prompt": "I need a Play Store feature graphic and the 1024 promo images for our two subscription tiers (Pro Monthly, Pro Yearly). The mockup is in mockup/, which still uses design-system.css.",
+      "expected_output": "Detects the mockup and uses its design-system.css as the token file without renaming it. Adds subs (ids like pro-monthly, pro-yearly) and feature to renderStorePage, using token values only. ?sub=0/1 export to apple/iap/<id>.png at 1024×1024 and ?feature to google/feature-graphic.png at 1024×500, verified with the size report. Does not draft listing text or descriptions; if asked for wording it isn't given, uses plain placeholders and says so.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Our App Store screenshots look different from the app — someone made them in Canva with different fonts and colors, and the headlines are long feature lists. Can you redo them properly? We have the HTML mockups in mockup/.",
-      "expected_output": "Rebuilds the set from mockup/design-system.css and the mockup's screens (not from the Canva images), rewriting headlines as short benefits (one idea per frame) with real in-device product copy. Explains the shot order and shows the gallery for review with the contrast audit. Export captures at authoring size × integer scale then resamples to exact store sizes, and the reply mentions verifying sizes against App Store Connect.",
+      "prompt": "Our App Store screenshots export at the wrong size and the headline on the third one wraps differently than in the browser. They're built with store.html in mockup/store.",
+      "expected_output": "Checks export.sh's size table and capture: window equals the authoring size, integer device scale, resample afterwards (never capture at store size). Reads the size report and the contrast section's line count and copy-band result for the third frame; reports the overflow and offers options (shorter text, smaller scale, larger y) without rewriting the headline. Mentions verifying sizes against App Store Connect.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Add Mac App Store screenshots to our store page using the two desktop mockup screens main--library and main--library-empty. Use the same headlines as the first two iPhone shots.",
+      "expected_output": "Adds two mac entries whose device is the desktop mockup's win() screens copied unchanged, headlines copied from the first two shots verbatim. Gallery mac section columns named 01-…, 02-… and tagged macOS. export.sh mac writes mac/2880x1800 and mac/1280x800 PNGs at exactly those sizes. No new colors or fonts on the page.",
       "files": []
     }
   ]

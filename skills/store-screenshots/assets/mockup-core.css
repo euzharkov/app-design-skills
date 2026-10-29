@@ -3,12 +3,14 @@
  * skill; device frames add their own file (phone.css, window.css).
  *
  * Everything here is preview-only material: the gallery canvas, toolbar,
- * section chrome, annotations, and the foundations page. Raw colors
- * are allowed in this file precisely because none of it is product design.
- * Product screens must take their values from design-system.css instead.
+ * section chrome, labels and tags, annotations, and the tokens section. Raw
+ * colors are allowed here because none of it belongs to the product, and
+ * none of it may take the product's values: the canvas stays neutral so
+ * every product's screens read the same way on it.
+ * What goes inside a screen is the product's; it takes values from tokens.css.
  *
  * You should rarely need to edit this file. Screens live in the HTML pages;
- * design values live in design-system.css.
+ * product values live in tokens.css.
  */
 
 * {
@@ -19,8 +21,8 @@
 
 body {
   --canvas-pad: 40px;
-  background: #ece9e3;
-  background-image: radial-gradient(1100px 500px at 18% -8%, #f7f5f0 0%, transparent 60%);
+  background: #f3f3f3;
+  background-image: radial-gradient(1100px 500px at 18% -8%, #ffffff 0%, transparent 60%);
   font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
   color: #26272b;
   padding: 48px var(--canvas-pad) 90px;
@@ -59,12 +61,12 @@ a {
 .page-head .section-index a {
   color: #46484f;
   text-decoration: none;
-  border-bottom: 1px solid #c9c7c0;
+  border-bottom: 1px solid #c6c6c6;
   padding-bottom: 1px;
 }
 .page-head .section-index a:hover {
   color: #1c1d21;
-  border-color: #8f8d86;
+  border-color: #8c8c8c;
 }
 
 /* ---- toolbar: theme, zoom, solo state ---- */
@@ -78,10 +80,10 @@ a {
   align-items: center;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(6px);
-  border: 1px solid #dcdad3;
+  border: 1px solid #dbdbdb;
   border-radius: 999px;
   padding: 6px 8px;
-  box-shadow: 0 6px 18px -8px rgba(30, 28, 22, 0.35);
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.25);
   font-size: 12.5px;
 }
 .toolbar .tb-btn {
@@ -93,16 +95,16 @@ a {
   white-space: nowrap;
 }
 .toolbar .tb-btn:hover {
-  background: #f0eee9;
+  background: #efefef;
 }
 .toolbar .tb-btn.on {
   background: #26272b;
-  color: #f6f5f2;
+  color: #f7f7f7;
 }
 .toolbar .tb-sep {
   width: 1px;
   height: 18px;
-  background: #dcdad3;
+  background: #dbdbdb;
 }
 
 /* ---- solo mode banner ---- */
@@ -110,14 +112,14 @@ a {
   max-width: 1240px;
   margin: 0 auto 6px;
   font-size: 13px;
-  color: #6b5d2e;
-  background: #f5eecd;
-  border: 1px solid #e3d9ad;
+  color: #1b4f80;
+  background: #eaf3fb;
+  border: 1px solid #b9d6f0;
   border-radius: 10px;
   padding: 8px 14px;
 }
 .solo-banner a {
-  color: #4d431f;
+  color: #123a5e;
   font-weight: 600;
 }
 
@@ -146,14 +148,14 @@ a {
   font-size: 11.5px;
   color: #8a8c93;
   text-decoration: none;
-  border: 1px solid #d7d5ce;
+  border: 1px solid #d6d6d6;
   border-radius: 999px;
   padding: 2px 9px;
   cursor: pointer;
 }
 .sec .solo-link:hover {
   color: #3d3f45;
-  border-color: #aeaca5;
+  border-color: #adadad;
 }
 .sec-inner > p {
   font-size: 14px;
@@ -189,7 +191,7 @@ a {
   height: 10px;
 }
 .rail::-webkit-scrollbar-thumb {
-  background: #cbc8c0;
+  background: #c8c8c8;
   border-radius: 8px;
 }
 
@@ -219,17 +221,24 @@ a {
   color: #26272b;
   font-weight: 650;
 }
+/* Screen name: its own line above the description. */
+.col-label .col-name {
+  display: block;
+}
 
-/* Fixed-height slot above every frame; holds the variant tag when present so
-   tagged and untagged screens stay top-aligned across the rail. */
+/* Fixed-height slot above every frame; holds the tag when present so tagged
+   and untagged screens stay top-aligned across the rail. Like labels, tags
+   read at true size whatever the frame zoom. */
 .tag-slot {
+  zoom: calc(1 / var(--frame-zoom, 0.85));
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Variant tag above a frame (pricing tier, experiment arm, platform…). */
+/* Tag above a frame: the platform (iOS, Android, macOS, Windows) or the
+   variant (Free, Plus, B) when a section mixes them. */
 .tag {
   font-size: 12px;
   font-weight: 650;
@@ -238,17 +247,23 @@ a {
   padding: 3px 10px;
   border-radius: 20px;
   white-space: nowrap;
-  background: #e2e0d9;
+  background: #e3e3e3;
   color: #55575e;
 }
+.tag svg {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  vertical-align: -1.5px;
+}
 .tag.accent {
-  background: #dfe3f8;
-  color: #37418f;
+  background: #deecf9;
+  color: #0067c0;
 }
 
 /* ---- screen: the product surface inside any frame ----
    Every frame (phone.css, window.css, …) wraps its content in .screen. The
-   foundations renderer resolves design values inside a .screen probe, and
+   tokens renderer resolves values inside a .screen probe, and
    the dark palette is scoped to .screen, so this class is the contract
    between the core and the frames. Frame files add size and shape. */
 .screen {
@@ -275,8 +290,8 @@ a {
   padding-bottom: 8px;
 }
 .note .n {
-  background: #f6f4ef;
-  border: 1px solid #e0ded7;
+  background: #f6f6f6;
+  border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 13px 16px;
   font-size: 13px;
@@ -300,7 +315,7 @@ a {
   color: #46484f;
 }
 
-/* ---- foundations section (auto-rendered by mockup.js) ---- */
+/* ---- tokens section (auto-rendered by mockup-core.js) ---- */
 .fd-block {
   margin-top: 20px;
 }
@@ -317,7 +332,7 @@ a {
 }
 .fd-swatch {
   width: 148px;
-  border: 1px solid #ddDBd4;
+  border: 1px solid #dcdcdc;
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
@@ -350,7 +365,7 @@ a {
   align-items: baseline;
   gap: 18px;
   padding: 10px 0;
-  border-bottom: 1px dashed #ddDBd4;
+  border-bottom: 1px dashed #dcdcdc;
 }
 .fd-type-row .spec {
   flex: 0 0 240px;
@@ -365,7 +380,7 @@ a {
 }
 .fd-type-sample {
   background: var(--canvas);
-  border: 1px solid #e0ded7;
+  border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 10px 16px;
   flex: 1;
@@ -386,8 +401,8 @@ a {
 }
 .fd-space-row .bar {
   height: 14px;
-  background: #b9c1ef;
-  border: 1px solid #98a3e6;
+  background: #a9cdee;
+  border: 1px solid #5a9bd8;
   border-radius: 3px;
 }
 
@@ -400,7 +415,7 @@ a {
   width: 110px;
   height: 68px;
   background: #fff;
-  border: 1px solid #c6c4bc;
+  border: 1px solid #c4c4c4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -424,11 +439,11 @@ a {
   letter-spacing: 0.06em;
   color: #8a8c93;
   padding: 6px 14px 6px 0;
-  border-bottom: 1px solid #d7d5ce;
+  border-bottom: 1px solid #d6d6d6;
 }
 .fd-audit td {
   padding: 7px 14px 7px 0;
-  border-bottom: 1px solid #e7e5de;
+  border-bottom: 1px solid #e6e6e6;
   color: #46484f;
   font-family: ui-monospace, Menlo, monospace;
   font-size: 12px;
@@ -450,7 +465,7 @@ a {
   font-weight: 700;
 }
 .fd-audit .large-only {
-  color: #8a6414;
+  color: #0067c0;
   font-weight: 700;
 }
 .fd-audit .fail {

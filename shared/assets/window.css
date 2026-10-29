@@ -3,7 +3,7 @@
  * after mockup-core.css. Raw colors are allowed here for the same reason as
  * in the core: OS chrome (traffic lights, caption buttons, menu bar,
  * taskbar, wallpaper) is workbench, not product. Everything the PRODUCT
- * owns inside a frame resolves from design-system.css roles.
+ * owns inside a frame resolves from tokens.css roles.
  *
  * Platform metrics live under .p-macos / .p-windows. Numbers are production
  * points, 1:1 at the window's declared size.
@@ -19,7 +19,7 @@
    product's roles so they follow light/dark automatically. A page may
    override any of them in its Layer-2 CSS (e.g. --win-sidebar: var(--canvas))
    — and if a derived surface carries text that matters, promote it to a real
-   role in design-system.css so the contrast audit can see it. */
+   role in tokens.css so the contrast audit can see it. */
 .screen {
   --win-bg: var(--canvas);
   --win-sidebar: color-mix(in srgb, var(--ink-900) 4%, var(--canvas));

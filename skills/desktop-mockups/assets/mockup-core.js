@@ -4,18 +4,19 @@
  * Pages declare content (sections of frame columns) and call renderMockupPage().
  * Device frames live in their own files loaded after this one (phone.js,
  * window.js); the core never assumes which device is being mocked.
- * This file renders the gallery chrome around that content and auto-documents
- * the design system:
+ * This file renders the canvas around that content — page head, section
+ * index, sections, named columns, platform/variant tags, notes — and
+ * auto-documents the tokens:
  *
- *   - foundations section: palette swatches, type ramp, spacing, radii — read
- *     live from design-system.css, so the style guide can never drift
+ *   - tokens section: color roles, type roles, spacing, radii — read live
+ *     from tokens.css (design-system.css in older mockups), so it can't drift
  *   - contrast audit: WCAG 2.1 ratios for declared fg/bg pairs, light & dark
  *   - toolbar: light/dark toggle and frame zoom
  *   - solo mode: ?solo=<section-id> renders one section only (fast loads,
  *     reliable screenshots on long pages)
  *
  * Deterministic URL params (useful for screenshots):
- *   ?solo=<section-id>   render a single section
+ *   ?solo=<section-id>   render a single section (?solo=tokens for the tokens)
  *   ?theme=dark          start in dark mode
  *   ?zoom=50|70|85|100   frame display size (authoring stays 1:1 with the
  *                        frame's production baseline; pages pick a default
@@ -82,9 +83,10 @@ function cssColor(rgb) {
   return rgb[3] < 1 ? `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${rgb[3]})` : `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
 }
 
-/* ================= design-system introspection ================= */
+/* ================= token introspection ================= */
 
-const SYSTEM_SHEET = /design-system\.css/;
+/* tokens.css; design-system.css is the name older mockups used. */
+const SYSTEM_SHEET = /(tokens|design-system)\.css/;
 
 /** Custom property names + .t-* type role classes, in declaration order. */
 function readSystemSheet() {
@@ -142,7 +144,7 @@ function groupProps(props) {
 function renderFoundations(container, contrastPairs) {
   const sheet = readSystemSheet();
   if (!sheet) {
-    container.innerHTML = `<p style="font-size:13px;color:#a8332a">Foundations need the page served over http (CSS rules are unreadable from file://). Run a static server and reload.</p>`;
+    container.innerHTML = `<p style="font-size:13px;color:#a8332a">The tokens section needs the page served over http (CSS rules are unreadable from file://). Run a static server and reload.</p>`;
     return;
   }
   const { props, typeRoles } = sheet;
@@ -155,7 +157,7 @@ function renderFoundations(container, contrastPairs) {
   /* palette */
   const colorProps = groups.other.filter((p) => parseColor(light[p]));
   if (colorProps.length) {
-    html += `<div class="fd-block"><h3>Palette — semantic roles${hasDark ? " (top: light · bottom: dark)" : ""}</h3><div class="fd-swatches">`;
+    html += `<div class="fd-block"><h3>Color roles${hasDark ? " (top: light · bottom: dark)" : ""}</h3><div class="fd-swatches">`;
     for (const p of colorProps) {
       const lc = parseColor(light[p]);
       const dc = parseColor(dark[p]);
@@ -179,7 +181,7 @@ function renderFoundations(container, contrastPairs) {
       const fam = cs.fontFamily.split(",")[0].replace(/["']/g, "");
       const spec = `${parseFloat(cs.fontSize)}/${parseFloat(cs.lineHeight) || "–"} · ${cs.fontWeight} · ${cs.letterSpacing === "normal" ? "0" : cs.letterSpacing} · ${fam}`;
       probe.remove();
-      html += `<div class="fd-type-row"><div class="spec"><b>.${cls}</b>${spec}</div><div class="fd-type-sample"><span class="${cls}">Design in the medium you ship</span></div></div>`;
+      html += `<div class="fd-type-row"><div class="spec"><b>.${cls}</b>${spec}</div><div class="fd-type-sample"><span class="${cls}">Sphinx of black quartz, judge my vow</span></div></div>`;
     }
     html += `</div>`;
   }
@@ -225,7 +227,7 @@ function renderFoundations(container, contrastPairs) {
       html += row(pair, light, "light");
       if (hasDark) html += row(pair, dark, "dark");
     }
-    html += `</table></div><p class="fd-pair-note">Body text needs ≥ 4.5:1. "AA large only" is acceptable solely for text ≥ 24px (or ≥ 18.5px bold) and for non-text UI. Fix fails in design-system.css, not by hiding the row.</p></div>`;
+    html += `</table></div><p class="fd-pair-note">WCAG 2.1: body text needs ≥ 4.5:1; "AA large only" covers text ≥ 24px (or ≥ 18.5px bold) and non-text UI. The audit reports; the values are the product's call.</p></div>`;
   }
 
   container.innerHTML = html;
@@ -233,9 +235,37 @@ function renderFoundations(container, contrastPairs) {
 
 /* ================= page rendering ================= */
 
+/* Platform glyphs for tags. A tag that starts with a platform name
+   (iOS, iPadOS, macOS, Android, Windows, Web) gets its glyph in front, so
+   platform columns read at a glance. Simple drawn marks, currentColor. */
+const APPLE_GLYPH = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.3 8.6c0-1.6 1.3-2.4 1.4-2.5-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6-.5 0-1.3-.6-2.2-.6-1.1 0-2.2.7-2.8 1.7-1.2 2.1-.3 5.2.9 6.9.6.8 1.2 1.7 2.1 1.7.8 0 1.2-.5 2.2-.5s1.3.5 2.2.5c.9 0 1.5-.8 2-1.7.6-.9.9-1.8.9-1.8s-1.8-.7-1.8-3z"/><path d="M9.7 3.6c.5-.6.8-1.4.7-2.1-.7 0-1.5.5-2 1.1-.4.5-.8 1.3-.7 2 .8.1 1.5-.4 2-1z"/></svg>`;
+const PLATFORM_GLYPHS = {
+  ios: APPLE_GLYPH,
+  ipados: APPLE_GLYPH,
+  macos: APPLE_GLYPH,
+  android: `<svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1.8 12.5a6.2 6.2 0 0 1 12.4 0zM5.9 9.4a.85.85 0 1 1-1.7 0 .85.85 0 0 1 1.7 0zm5.9 0a.85.85 0 1 1-1.7 0 .85.85 0 0 1 1.7 0z"/><path d="M4.5 6.3 3.2 4.1M11.5 6.3l1.3-2.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  windows: `<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1.5" y="1.5" width="6" height="6"/><rect x="8.5" y="1.5" width="6" height="6"/><rect x="1.5" y="8.5" width="6" height="6"/><rect x="8.5" y="8.5" width="6" height="6"/></svg>`,
+  web: `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.3"/><path d="M1.7 8h12.6M8 1.7c2 2 2 10.6 0 12.6M8 1.7c-2 2-2 10.6 0 12.6"/></svg>`,
+};
+
+function tagHTML(tag) {
+  const platform = tag.split(/[\s·]/)[0].toLowerCase();
+  return (PLATFORM_GLYPHS[platform] || "") + tag;
+}
+
+/** "Week, empty" → "week-empty": screen names become stable ids. */
+function slug(text) {
+  return text
+    .replace(/<[^>]*>/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function renderMockupPage(cfg) {
   const params = new URLSearchParams(location.search);
-  const solo = params.get("solo");
+  /* "foundations" is the tokens section's id in older mockups. */
+  const solo = params.get("solo") === "foundations" ? "tokens" : params.get("solo");
   const theme = params.get("theme");
   const zoom = params.get("zoom");
 
@@ -249,7 +279,7 @@ function renderMockupPage(cfg) {
   const app = document.getElementById("app") || document.body;
   const sections = [];
   if (cfg.foundations !== false)
-    sections.push({ id: "foundations", title: "Foundations", desc: "Rendered live from design-system.css — swatches, type, spacing, radii, and the contrast audit can’t drift from the real values.", foundations: true });
+    sections.push({ id: "tokens", title: "Tokens", desc: "Read live from the token stylesheet: color roles, type roles, spacing, radii, and a contrast audit of the declared pairs.", foundations: true });
   sections.push(...(cfg.sections || []));
 
   const shown = solo ? sections.filter((s) => s.id === solo) : sections;
@@ -292,8 +322,12 @@ function renderMockupPage(cfg) {
     html += `</div><div class="rail">`;
     for (const col of sec.cols || []) {
       /* Every column gets the tag slot, filled or empty, so frames share the
-         same top line whether or not a state label is present. */
-      html += `<div class="col"><div class="tag-slot">${col.tag ? `<span class="tag${col.tagAccent ? " accent" : ""}">${col.tag}</span>` : ""}</div>${col.html}<div class="col-label">${col.label || ""}</div></div>`;
+         same top line whether or not a tag is present. A named column also
+         gets an id, <section-id>--<name>[--<tag>], so each screen is
+         addressable and platform twins sharing a name stay distinct. */
+      const screenId = col.name ? [sec.id, slug(col.name), col.tag ? slug(col.tag) : ""].filter(Boolean).join("--") : "";
+      const label = (col.name ? `<b class="col-name">${col.name}</b>` : "") + (col.label || "");
+      html += `<div class="col"${screenId ? ` id="${screenId}"` : ""}><div class="tag-slot">${col.tag ? `<span class="tag${col.tagAccent ? " accent" : ""}">${tagHTML(col.tag)}</span>` : ""}</div>${col.html}<div class="col-label">${label}</div></div>`;
     }
     html += `</div>`;
     if (sec.notes && sec.notes.length) html += `<div class="note insec">${sec.notes.join("")}</div>`;
